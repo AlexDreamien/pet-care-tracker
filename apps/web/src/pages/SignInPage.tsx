@@ -1,7 +1,7 @@
 import { startAuthentication } from '@simplewebauthn/browser';
 import { type FormEvent, type ReactNode, useState } from 'react';
 import { api } from '../api/client';
-import { useAction } from '../app/hooks';
+import { useAction, useResource } from '../app/hooks';
 import { useSession } from '../app/session';
 import { Button, Card, Field, Input } from '../ui/primitives';
 
@@ -13,7 +13,12 @@ export function SignInPage(): ReactNode {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
   const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
+
+  // Whether this instance asks for an invite code is public: the form has to know before
+  // anyone is signed in.
+  const instance = useResource<{ inviteRequired: boolean }>('/config');
 
   const submit = useAction(async () => {
     if (mode === 'signIn') {
@@ -26,6 +31,7 @@ export function SignInPage(): ReactNode {
       email,
       password,
       displayName,
+      inviteCode: inviteCode || undefined,
     });
     // Shown before the app opens, because it is shown exactly once.
     setRecoveryCode(created.recoveryCode);
@@ -68,11 +74,13 @@ export function SignInPage(): ReactNode {
       ? t('auth.wrongCredentials')
       : error?.code === 'email_taken'
         ? t('auth.emailTaken')
-        : error?.code === 'offline'
-          ? t('state.offlineWrite')
-          : error && error.code !== 'validation_failed'
-            ? t('state.error')
-            : null;
+        : error?.code === 'forbidden'
+          ? t('auth.inviteWrong')
+          : error?.code === 'offline'
+            ? t('state.offlineWrite')
+            : error && error.code !== 'validation_failed'
+              ? t('state.error')
+              : null;
 
   return (
     <main className="mx-auto grid min-h-dvh max-w-md place-items-center px-4">
@@ -102,6 +110,16 @@ export function SignInPage(): ReactNode {
                 required
               />
             </Field>
+
+            {mode === 'register' && instance.data?.inviteRequired && (
+              <Field label={t('auth.inviteCode')} hint={t('auth.inviteHint')}>
+                <Input
+                  value={inviteCode}
+                  onChange={(event) => setInviteCode(event.target.value)}
+                  required
+                />
+              </Field>
+            )}
 
             <Field
               label={t('auth.password')}

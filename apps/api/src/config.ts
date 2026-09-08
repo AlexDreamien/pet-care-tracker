@@ -24,6 +24,14 @@ const configSchema = z.object({
     .int()
     .positive()
     .default(15 * 1024 * 1024),
+  /**
+   * When set, registration requires this code.
+   *
+   * A publicly reachable instance with open registration and file uploads is an invitation
+   * to fill someone else's volume. Empty leaves registration open, which is the sensible
+   * default on a laptop and the wrong one on the internet.
+   */
+  SIGNUP_INVITE_CODE: z.string().default(''),
 });
 
 export type Config = z.infer<typeof configSchema> & {

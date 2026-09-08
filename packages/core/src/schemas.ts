@@ -110,6 +110,8 @@ export const registerSchema = z.object({
   password: passwordSchema,
   displayName: requiredText(80),
   locale: localeSchema.default('ru'),
+  /** Required only when the instance is configured to ask for one. */
+  inviteCode: z.string().max(200).optional(),
 });
 
 export const loginSchema = z.object({

@@ -85,6 +85,10 @@ Register an account; the first user owns a household. **Save the recovery code s
 registration** — there is no mail service here, so it is the only way back in if you forget
 your password.
 
+On anything reachable from the internet, set `SIGNUP_INVITE_CODE`. Open registration on an
+instance that also accepts file uploads is an invitation to fill your volume; with the
+variable set, the registration form asks for the code and refuses without it.
+
 ### Installing it on a phone
 
 - **iOS (Safari):** Share → _Add to Home Screen_. It then opens without browser chrome, and
@@ -159,6 +163,10 @@ SQLite and uploaded files on a persistent volume. Pushing to `main` deploys.
 ```bash
 flyctl launch --no-deploy      # once
 flyctl volumes create pet_data --size 1
+```
+
+```bash
+flyctl secrets set SIGNUP_INVITE_CODE=something-only-you-know
 ```
 
 Set `PUBLIC_ORIGIN` in `fly.toml` to the real hostname before the first deploy: WebAuthn

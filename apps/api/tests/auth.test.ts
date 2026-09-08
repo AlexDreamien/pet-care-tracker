@@ -84,6 +84,47 @@ describe('registration', () => {
   });
 });
 
+describe('invite-only registration', () => {
+  it('is open by default and closed once a code is configured', async () => {
+    const open = await makeApp();
+    expect(
+      (await open.app.inject({ method: 'GET', url: '/api/v1/config' })).json().inviteRequired,
+    ).toBe(false);
+    await open.close();
+
+    const gated = await makeApp(undefined, { SIGNUP_INVITE_CODE: 'let-me-in' });
+    try {
+      expect(
+        (await gated.app.inject({ method: 'GET', url: '/api/v1/config' })).json().inviteRequired,
+      ).toBe(true);
+
+      // A public instance with open registration and uploads fills someone else's volume.
+      const without = await gated.app.inject({
+        method: 'POST',
+        url: '/api/v1/auth/register',
+        payload: CREDENTIALS,
+      });
+      expect(without.statusCode).toBe(403);
+
+      const wrong = await gated.app.inject({
+        method: 'POST',
+        url: '/api/v1/auth/register',
+        payload: { ...CREDENTIALS, inviteCode: 'guess' },
+      });
+      expect(wrong.statusCode).toBe(403);
+
+      const right = await gated.app.inject({
+        method: 'POST',
+        url: '/api/v1/auth/register',
+        payload: { ...CREDENTIALS, inviteCode: 'let-me-in' },
+      });
+      expect(right.statusCode).toBe(201);
+    } finally {
+      await gated.close();
+    }
+  });
+});
+
 describe('login', () => {
   it('accepts the right password and sets a session', async () => {
     await signUp(test);

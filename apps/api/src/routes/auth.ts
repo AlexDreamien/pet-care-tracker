@@ -10,6 +10,7 @@ import {
   revokeAllSessions,
   revokeSession,
   SESSION_COOKIE,
+  safeEquals,
   SESSION_DAYS,
   updateProfile,
   useRecoveryCode,
@@ -34,6 +35,11 @@ function sessionCookieOptions(context: AppContext) {
 export function registerAuthRoutes(app: FastifyInstance, context: AppContext): void {
   app.post('/auth/register', async (request, reply) => {
     const input = registerSchema.parse(request.body);
+
+    const required = context.config.SIGNUP_INVITE_CODE;
+    if (required !== '' && !safeEquals(required, input.inviteCode ?? '')) {
+      throw new ApiError(403, 'forbidden', 'this instance is invite-only');
+    }
 
     try {
       const created = await registerUser(context.database, { ...input, now: context.now() });

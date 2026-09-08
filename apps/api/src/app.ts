@@ -89,6 +89,11 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
 
   app.get('/api/v1/health', async () => ({ status: 'ok' }));
 
+  /** What the sign-in screen needs before anyone is signed in. */
+  app.get('/api/v1/config', async () => ({
+    inviteRequired: context.config.SIGNUP_INVITE_CODE !== '',
+  }));
+
   /**
    * The built SPA is served from the same origin as the API.
    *

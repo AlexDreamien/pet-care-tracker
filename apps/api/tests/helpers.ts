@@ -15,7 +15,10 @@ export interface TestApp {
   close(): Promise<void>;
 }
 
-export async function makeApp(startingAt = '2026-09-08T12:00:00Z'): Promise<TestApp> {
+export async function makeApp(
+  startingAt = '2026-09-08T12:00:00Z',
+  env: Record<string, string> = {},
+): Promise<TestApp> {
   const database = createDatabase();
   const uploadDir = mkdtempSync(join(tmpdir(), 'pct-uploads-'));
   const config = loadConfig({
@@ -23,6 +26,7 @@ export async function makeApp(startingAt = '2026-09-08T12:00:00Z'): Promise<Test
     PUBLIC_ORIGIN: 'http://localhost:5173',
     DATABASE_PATH: ':memory:',
     UPLOAD_DIR: uploadDir,
+    ...env,
   } as NodeJS.ProcessEnv);
 
   let now = new Date(startingAt);
