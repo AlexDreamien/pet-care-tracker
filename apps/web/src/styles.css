@@ -1,0 +1,86 @@
+@import 'tailwindcss';
+
+/**
+ * A warm, quiet palette. This is an application people open when something is wrong with
+ * an animal they love, so nothing shouts except the things that need to.
+ *
+ * `@theme` holds the light palette only. Tailwind 4 hoists `@theme` declarations out of
+ * any at-rule they are written in, so a `@theme` inside a `prefers-color-scheme` block
+ * does not become conditional — it simply overwrites the light values and the light theme
+ * ceases to exist. Dark mode therefore overrides the emitted variables with ordinary CSS
+ * below, which is conditional and works.
+ */
+@theme {
+  --color-canvas: #f7f5f2;
+  --color-surface: #ffffff;
+  --color-line: #e4ded6;
+  --color-ink: #1f2421;
+  --color-muted: #6b7069;
+
+  --color-brand: #2f6f5e;
+  --color-brand-soft: #e3efe9;
+
+  /* Overdue and allergies: the only two things allowed to be loud. */
+  --color-alarm: #b4542f;
+  --color-alarm-soft: #f8e8e0;
+
+  --color-calm: #4a6fa5;
+  --color-calm-soft: #e6ecf5;
+
+  --font-sans:
+    system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+
+  --radius-card: 0.875rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-canvas: #16181a;
+    --color-surface: #1e2124;
+    --color-line: #2f3438;
+    --color-ink: #e8e6e1;
+    --color-muted: #9aa09b;
+
+    /* Lifted, not inverted: the same green at the light step would vanish on a dark card. */
+    --color-brand: #5fae97;
+    --color-brand-soft: #1f3a33;
+
+    --color-alarm: #e08a63;
+    --color-alarm-soft: #3a2620;
+
+    --color-calm: #8aa9d6;
+    --color-calm-soft: #222c3a;
+  }
+}
+
+html {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  /* Room for the home indicator on an installed iOS app. */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  /* An installed app should not rubber-band like a web page. */
+  overscroll-behavior-y: none;
+}
+
+/* Inputs on iOS zoom the viewport below 16px; that reads as a bug, not a design. */
+input,
+select,
+textarea {
+  font-size: max(1rem, 16px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

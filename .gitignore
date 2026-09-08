@@ -25,3 +25,6 @@ Thumbs.db
 # Test and coverage output
 coverage/
 .tmp/
+
+# Local run data and generated demo database
+.local/

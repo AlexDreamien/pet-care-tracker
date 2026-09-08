@@ -1,6 +1,8 @@
+import { resolve } from 'node:path';
 import cookie from '@fastify/cookie';
 import multipart from '@fastify/multipart';
 import rateLimit from '@fastify/rate-limit';
+import fastifyStatic from '@fastify/static';
 import Fastify, { type FastifyInstance } from 'fastify';
 import { ZodError } from 'zod';
 import { resolveSession, SESSION_COOKIE } from './domain/auth';
@@ -83,11 +85,26 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
       .send(toErrorBody(new ApiError(500, 'internal_error', 'something went wrong')));
   });
 
-  app.setNotFoundHandler((_request, reply) =>
-    reply.status(404).send(toErrorBody(new ApiError(404, 'not_found', 'no such route'))),
-  );
-
   app.get('/api/v1/health', async () => ({ status: 'ok' }));
+
+  /**
+   * The built SPA is served from the same origin as the API.
+   *
+   * One origin means no CORS, a plain session cookie, and a service worker whose scope
+   * covers everything the application talks to. Fastify allows one not-found handler per
+   * prefix, so this is the only place that decides what a 404 means.
+   */
+  if (context.config.WEB_DIST) {
+    await app.register(fastifyStatic, { root: resolve(context.config.WEB_DIST) });
+  }
+
+  app.setNotFoundHandler((request, reply) => {
+    if (!context.config.WEB_DIST || request.url.startsWith('/api/')) {
+      return reply.status(404).send(toErrorBody(new ApiError(404, 'not_found', 'no such route')));
+    }
+    // Anything else is a client-side route; the SPA decides what it means.
+    return reply.sendFile('index.html');
+  });
 
   await app.register(
     async (api) => {

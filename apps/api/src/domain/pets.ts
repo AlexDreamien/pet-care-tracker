@@ -35,6 +35,7 @@ function toRow(input: PetInput) {
     registrationNumber: orNull(input.registrationNumber),
     neutered: input.neutered,
     neuteredOn: orNull(input.neuteredOn),
+    avatarFileId: orNull(input.avatarFileId),
     notes: orNull(input.notes),
   };
 }

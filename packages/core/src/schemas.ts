@@ -166,6 +166,7 @@ export const petSchema = z
     registrationNumber: optionalText(60),
     neutered: z.boolean().default(false),
     neuteredOn: isoDateSchema.optional(),
+    avatarFileId: z.uuid().optional(),
     notes: optionalText(2000),
   })
   .refine((pet) => pet.species !== 'other' || (pet.speciesLabel ?? '') !== '', {

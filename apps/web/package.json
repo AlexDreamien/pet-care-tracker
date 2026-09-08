@@ -1,0 +1,31 @@
+{
+  "name": "@pet-care-tracker/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "React front end: pet card, medical record, measurements and agenda, installable as a PWA",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --build"
+  },
+  "dependencies": {
+    "@pet-care-tracker/core": "0.1.0",
+    "@simplewebauthn/browser": "^13.2.2",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^5.2.0",
+    "playwright": "^1.63.0",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.2.1",
+    "vite-plugin-pwa": "^1.0.5"
+  }
+}

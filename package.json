@@ -23,7 +23,9 @@
     "api:dev": "npm run dev -w @pet-care-tracker/api",
     "migrate": "npm run migrate -w @pet-care-tracker/api",
     "web": "npm run dev -w @pet-care-tracker/web",
-    "build": "npm run build -w @pet-care-tracker/web"
+    "build": "npm run build -w @pet-care-tracker/web",
+    "local": "node tools/local.mjs",
+    "capture": "node tools/capture.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.20.1",

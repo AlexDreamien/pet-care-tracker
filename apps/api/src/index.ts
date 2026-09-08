@@ -1,6 +1,5 @@
 import { mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import fastifyStatic from '@fastify/static';
 import { buildApp } from './app';
 import { loadConfig } from './config';
 import { createDatabase } from './db/client';
@@ -21,23 +20,6 @@ async function main(): Promise<void> {
     context: { database, config, now: () => new Date() },
     logger: true,
   });
-
-  /**
-   * The built SPA is served from the same origin as the API.
-   *
-   * One origin means no CORS, a plain session cookie, and a service worker whose scope
-   * covers everything the application talks to.
-   */
-  if (config.WEB_DIST) {
-    await app.register(fastifyStatic, { root: resolve(config.WEB_DIST) });
-    app.setNotFoundHandler((request, reply) => {
-      if (request.url.startsWith('/api/')) {
-        return reply.status(404).send({ error: { code: 'not_found', message: 'no such route' } });
-      }
-      // Anything else is a client-side route; the SPA decides what it means.
-      return reply.sendFile('index.html');
-    });
-  }
 
   const housekeeping = setInterval(() => {
     const now = new Date();

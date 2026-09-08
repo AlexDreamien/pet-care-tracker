@@ -104,6 +104,97 @@ describe('buildAgenda', () => {
     ]);
   });
 
+  it('carries something still owed into a window that starts today', () => {
+    // The bug this prevents: an agenda from today hides exactly what is late, and the home
+    // screen looks reassuringly empty while being wrong.
+    const lapsed: AgendaInput = {
+      events: [],
+      derived: [
+        {
+          id: 'v9',
+          petId: 'p1',
+          petName: 'Барсик',
+          source: 'vaccination',
+          title: 'Бешенство',
+          dueOn: '2026-03-01',
+        },
+      ],
+    };
+
+    const items = buildAgenda(lapsed, { from: '2026-09-08', to: '2026-12-08' }, '2026-09-08');
+    expect(items).toHaveLength(1);
+    expect(items[0]?.date).toBe('2026-03-01');
+    expect(items[0]?.overdue).toBe(true);
+  });
+
+  it('does not carry forward something already done', () => {
+    const done: AgendaInput = {
+      events: [
+        {
+          id: 'e9',
+          petId: 'p1',
+          petName: 'Барсик',
+          type: 'grooming',
+          title: 'Груминг',
+          scheduledOn: '2026-08-01',
+          lastCompletedOn: '2026-08-02',
+        },
+      ],
+      derived: [],
+    };
+
+    expect(buildAgenda(done, { from: '2026-09-08', to: '2026-12-08' }, '2026-09-08')).toEqual([]);
+  });
+
+  it('carries at most one occurrence of a neglected recurring chore', () => {
+    // Six skipped nail trims are one job to do, not six rows.
+    const neglected: AgendaInput = {
+      events: [
+        {
+          id: 'e10',
+          petId: 'p1',
+          petName: 'Барсик',
+          type: 'nail_trim',
+          title: 'Когти',
+          scheduledOn: '2026-01-05',
+          recurrence: {
+            kind: 'fixed_calendar',
+            interval: 1,
+            unit: 'month',
+            anchor: '2026-01-05',
+          },
+        },
+      ],
+      derived: [],
+    };
+
+    const items = buildAgenda(neglected, { from: '2026-09-08', to: '2026-10-08' }, '2026-09-08');
+    const overdue = items.filter((item) => item.overdue);
+
+    expect(overdue).toHaveLength(1);
+    // The most recent missed one is the one a person acts on.
+    expect(overdue[0]?.date).toBe('2026-09-05');
+    expect(items.map((item) => item.date)).toEqual(['2026-09-05', '2026-10-05']);
+  });
+
+  it('leaves a date beyond the window alone', () => {
+    const later: AgendaInput = {
+      events: [],
+      derived: [
+        {
+          id: 'd9',
+          petId: 'p1',
+          petName: 'Барсик',
+          source: 'document_expiry',
+          title: 'Ветпаспорт',
+          dueOn: '2027-06-01',
+        },
+      ],
+    };
+
+    expect(buildAgenda(later, { from: '2026-09-08', to: '2026-12-08' }, '2026-09-08')).toEqual([]);
+  });
+
   it('yields a single date for an after-completion rule', () => {
     const wormer: AgendaInput = {
       events: [

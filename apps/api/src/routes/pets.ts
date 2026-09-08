@@ -2,6 +2,7 @@ import { petSchema, todayIn } from '@pet-care-tracker/core';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { assertWritable, petForRead, petForWrite, resolveHousehold } from '../domain/access';
+import { findFile } from '../domain/files';
 import {
   archivePet,
   createPet,
@@ -12,6 +13,7 @@ import {
   updatePet,
 } from '../domain/pets';
 import { type AppContext, requireAuth } from '../http/context';
+import { badRequest } from '../http/errors';
 
 const listQuery = z.object({
   householdId: z.uuid().optional(),
@@ -40,10 +42,20 @@ export function registerPetRoutes(app: FastifyInstance, context: AppContext): vo
     };
   });
 
+  /** An avatar from another household would put someone else's photo on this pet. */
+  const assertOwnFile = (householdId: string, fileId: string | undefined): void => {
+    if (!fileId) return;
+    const file = findFile(context.database, fileId);
+    if (!file || file.householdId !== householdId) {
+      throw badRequest('validation_failed', 'no such file');
+    }
+  };
+
   app.post('/pets', async (request, reply) => {
     const { user } = requireAuth(request);
     const body = createBody.parse(request.body);
     const access = assertWritable(resolveHousehold(context.database, user.id, body.householdId));
+    assertOwnFile(access.householdId, body.avatarFileId);
 
     const pet = createPet(context.database, {
       householdId: access.householdId,
@@ -62,9 +74,10 @@ export function registerPetRoutes(app: FastifyInstance, context: AppContext): vo
 
   app.patch<{ Params: { id: string } }>('/pets/:id', async (request) => {
     const { user } = requireAuth(request);
-    petForWrite(context.database, user.id, request.params.id);
+    const { access } = petForWrite(context.database, user.id, request.params.id);
 
     const input = petSchema.parse(request.body);
+    assertOwnFile(access.householdId, input.avatarFileId);
     const pet = updatePet(context.database, request.params.id, input, context.now());
     return { pet: petView(context.database, pet, todayFor(user.timeZone)) };
   });

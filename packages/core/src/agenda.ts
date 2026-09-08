@@ -11,7 +11,7 @@
  * duplicates that outlive the record they came from.
  */
 
-import { compareDates, isBefore, type IsoDate } from './date';
+import { addDays, compareDates, isBefore, type IsoDate } from './date';
 import type { CalendarAlarm, CalendarEvent } from './ics';
 import { occurrencesBetween, type RecurrenceRule } from './recurrence';
 
@@ -135,21 +135,42 @@ export function collectSeries(input: AgendaInput): AgendaSeries[] {
 }
 
 /**
- * Every date a series falls on inside the window.
+ * How far back an unmet date is still worth carrying forward. Two years covers a lapsed
+ * annual booster; beyond that the record, not the agenda, is the place to look.
+ */
+export const OVERDUE_LOOKBACK_DAYS = 730;
+
+/**
+ * Every date a series contributes to the window.
  *
- * A series without a rule contributes its single date; a rule contributes whatever
- * `occurrencesBetween` allows, which for an after-completion rule is the next one only.
+ * Anything still owed from before the window is carried into it. An agenda that started at
+ * today would hide exactly the things that need doing — a vaccination that lapsed in March
+ * is not less due in September — and the screen would look reassuringly empty while being
+ * wrong.
+ *
+ * A recurring series carries at most **one** overdue occurrence: a monthly chore skipped
+ * since spring is one job to do, not six.
  */
 function datesInWindow(series: AgendaSeries, window: AgendaWindow): IsoDate[] {
   if (!series.recurrence) {
-    const inside =
-      compareDates(series.start, window.from) >= 0 && compareDates(series.start, window.to) <= 0;
-    return inside ? [series.start] : [];
+    if (compareDates(series.start, window.to) > 0) return [];
+    if (compareDates(series.start, window.from) >= 0) return [series.start];
+    return isCompleted(series, series.start) ? [] : [series.start];
   }
 
-  return occurrencesBetween(series.recurrence, window.from, window.to, {
+  const inWindow = occurrencesBetween(series.recurrence, window.from, window.to, {
     lastCompletedOn: series.lastCompletedOn,
   });
+
+  const earlier = occurrencesBetween(
+    series.recurrence,
+    addDays(window.from, -OVERDUE_LOOKBACK_DAYS),
+    addDays(window.from, -1),
+    { lastCompletedOn: series.lastCompletedOn },
+  ).filter((date) => !isCompleted(series, date));
+
+  const carried = earlier.length > 0 ? [earlier[earlier.length - 1] as IsoDate] : [];
+  return [...carried, ...inWindow];
 }
 
 /**
