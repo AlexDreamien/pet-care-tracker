@@ -9,7 +9,9 @@
 
 import BetterSqlite3 from 'better-sqlite3';
 import { afterEach, describe, expect, it } from 'vitest';
+import { getTableConfig } from 'drizzle-orm/sqlite-core';
 import { ensureColumns, migrate, SCHEMA_VERSION } from '../src/db/migrate';
+import { schema } from '../src/db/schema';
 
 let database: BetterSqlite3.Database;
 
@@ -119,6 +121,24 @@ describe('migrating an existing database', () => {
     expect(migrate(database)).toEqual([]);
     expect(ensureColumns(database)).toEqual([]);
     expect(database.pragma('user_version', { simple: true })).toBe(SCHEMA_VERSION);
+  });
+
+  it('leaves a migrated database matching the schema in full', () => {
+    // The general form of the bug: not "did we remember lost_token" but "is anything the
+    // schema declares still missing after a migration".
+    database = olderDatabase();
+    migrate(database);
+
+    const missing: string[] = [];
+    for (const table of Object.values(schema)) {
+      const config = getTableConfig(table);
+      const actual = columnsOf(database, config.name);
+      for (const column of config.columns) {
+        if (!actual.has(column.name)) missing.push(`${config.name}.${column.name}`);
+      }
+    }
+
+    expect(missing).toEqual([]);
   });
 
   it('adds nothing to a database created from the current baseline', () => {

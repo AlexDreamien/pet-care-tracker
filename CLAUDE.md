@@ -74,6 +74,11 @@ which plain `node` cannot resolve. Use the scripts, not `node src/…`.
   so a `@theme` inside `prefers-color-scheme: dark` silently overwrites the light palette
   instead of qualifying it, and light mode ceases to exist. Dark mode overrides the emitted
   variables with ordinary CSS in `styles.css`.
+- **`CREATE TABLE IF NOT EXISTS` never alters an existing table.** Adding a column to the
+  DDL alone does nothing to a deployed database, and the first index or query touching it
+  fails at boot — that took the live instance down once. `migrate` runs tables, then
+  `ensureColumns` (derived from the Drizzle schema), then indexes. Tests that start from an
+  empty database cannot catch this; `tests/migrate.test.ts` starts from an older one.
 - **Fastify allows one not-found handler per prefix.** `buildApp` owns it, and decides
   between a JSON 404 and the SPA shell by looking at `WEB_DIST` and the path. Registering a
   second one anywhere crashes the server at boot — a path that only runs in production,
