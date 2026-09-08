@@ -8,6 +8,7 @@ export * from './measurements';
 export * from './bcs';
 export * from './vaccination';
 export * from './parasite';
+export * from './medication';
 export * from './ics';
 export * from './agenda';
 export * from './schemas';

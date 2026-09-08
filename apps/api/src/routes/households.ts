@@ -3,14 +3,18 @@ import { eq } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { householdById } from '../domain/access';
-import { findUserByEmail, membershipRole } from '../domain/auth';
+import { findUserByEmail, isKnownTimeZone, membershipRole } from '../domain/auth';
 import { randomToken, uuidv7 } from '../domain/ids';
 import { householdMembers, households, users } from '../db/schema';
 import { type AppContext, requireAuth } from '../http/context';
-import { conflict, forbidden, notFound } from '../http/errors';
+import { badRequest, conflict, forbidden, notFound } from '../http/errors';
 
 const updateSchema = z
-  .object({ name: z.string().trim().min(1).max(80).optional() })
+  .object({
+    name: z.string().trim().min(1).max(80).optional(),
+    /** Appointment times are written in this zone, and the ICS feed converts with it. */
+    timeZone: z.string().trim().max(64).optional(),
+  })
   .and(reminderPreferenceSchema.partial());
 
 export function registerHouseholdRoutes(app: FastifyInstance, context: AppContext): void {
@@ -57,9 +61,16 @@ export function registerHouseholdRoutes(app: FastifyInstance, context: AppContex
     requireRole(user.id, request.params.id, ['owner', 'editor']);
 
     const input = updateSchema.parse(request.body ?? {});
+    if (input.timeZone !== undefined && !isKnownTimeZone(input.timeZone)) {
+      throw badRequest('validation_failed', 'unknown time zone', {
+        fields: [{ path: 'timeZone', message: 'not an IANA time zone' }],
+      });
+    }
+
     const patch = Object.fromEntries(
       Object.entries({
         name: input.name,
+        timeZone: input.timeZone,
         reminderLeadDays: input.leadDays,
         reminderHour: input.hour,
       }).filter(([, value]) => value !== undefined),

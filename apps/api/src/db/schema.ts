@@ -101,6 +101,11 @@ export const households = sqliteTable('households', {
   calendarToken: text('calendar_token').notNull(),
   reminderLeadDays: integer('reminder_lead_days').notNull().default(2),
   reminderHour: integer('reminder_hour').notNull().default(9),
+  /**
+   * The zone appointment times are written in. It belongs to the household rather than to
+   * a member, because the calendar feed is fetched without anyone signed in.
+   */
+  timeZone: text('time_zone').notNull().default('UTC'),
   createdAt: createdAt(),
 });
 

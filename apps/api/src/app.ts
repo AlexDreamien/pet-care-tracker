@@ -8,8 +8,15 @@ import type { AppContext } from './http/context';
 import { ApiError, toErrorBody, validationFailed } from './http/errors';
 import { registerAuthRoutes } from './routes/auth';
 import { registerPasskeyRoutes } from './routes/passkeys';
+import { registerAgendaRoutes } from './routes/agenda';
+import { registerContactRoutes } from './routes/contacts';
+import { registerDocumentRoutes } from './routes/documents';
+import { registerEventRoutes } from './routes/events';
+import { registerExportRoutes } from './routes/export';
 import { registerFileRoutes } from './routes/files';
 import { registerHouseholdRoutes } from './routes/households';
+import { registerMeasurementRoutes } from './routes/measurements';
+import { registerMedicalRoutes } from './routes/medical';
 import { registerPetRoutes } from './routes/pets';
 
 export interface BuildAppOptions {
@@ -89,6 +96,13 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
       registerHouseholdRoutes(api, context);
       registerPetRoutes(api, context);
       registerFileRoutes(api, context);
+      registerDocumentRoutes(api, context);
+      registerMedicalRoutes(api, context);
+      registerMeasurementRoutes(api, context);
+      registerContactRoutes(api, context);
+      registerEventRoutes(api, context);
+      registerAgendaRoutes(api, context);
+      registerExportRoutes(api, context);
     },
     { prefix: '/api/v1' },
   );

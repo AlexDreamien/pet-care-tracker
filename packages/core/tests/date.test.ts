@@ -15,6 +15,7 @@ import {
   todayIn,
   toEpochDay,
   weekday,
+  zonedDateTimeToInstant,
 } from '../src/date';
 
 describe('parseDate', () => {
@@ -132,6 +133,38 @@ describe('todayIn', () => {
     expect(todayIn(instant, 'UTC')).toBe('2026-09-08');
     expect(todayIn(instant, 'Europe/Moscow')).toBe('2026-09-09');
     expect(todayIn(instant, 'America/Los_Angeles')).toBe('2026-09-08');
+  });
+});
+
+describe('zonedDateTimeToInstant', () => {
+  it('reads a wall-clock time in a fixed-offset zone', () => {
+    expect(zonedDateTimeToInstant('2026-09-08', '15:00', 'Europe/Moscow')).toBe(
+      '2026-09-08T12:00:00.000Z',
+    );
+    expect(zonedDateTimeToInstant('2026-09-08', '15:00', 'UTC')).toBe('2026-09-08T15:00:00.000Z');
+  });
+
+  it('follows the seasonal offset of a zone that observes daylight saving', () => {
+    expect(zonedDateTimeToInstant('2026-01-15', '15:00', 'Europe/Berlin')).toBe(
+      '2026-01-15T14:00:00.000Z',
+    );
+    expect(zonedDateTimeToInstant('2026-07-15', '15:00', 'Europe/Berlin')).toBe(
+      '2026-07-15T13:00:00.000Z',
+    );
+  });
+
+  it('lands on the right side of the clocks going forward', () => {
+    // 29 March 2026 is the European spring change; 03:30 local is already summer time.
+    expect(zonedDateTimeToInstant('2026-03-29', '03:30', 'Europe/Berlin')).toBe(
+      '2026-03-29T01:30:00.000Z',
+    );
+    expect(zonedDateTimeToInstant('2026-03-29', '00:30', 'Europe/Berlin')).toBe(
+      '2026-03-28T23:30:00.000Z',
+    );
+  });
+
+  it('rejects something that is not a time', () => {
+    expect(() => zonedDateTimeToInstant('2026-09-08', '25:00', 'UTC')).toThrow(/HH:MM/);
   });
 });
 

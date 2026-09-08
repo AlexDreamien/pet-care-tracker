@@ -66,6 +66,7 @@ const STATEMENTS = [
     calendar_token TEXT NOT NULL,
     reminder_lead_days INTEGER NOT NULL DEFAULT 2,
     reminder_hour INTEGER NOT NULL DEFAULT 9,
+    time_zone TEXT NOT NULL DEFAULT 'UTC',
     created_at TEXT NOT NULL
   )`,
 

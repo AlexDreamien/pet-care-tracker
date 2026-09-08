@@ -78,11 +78,39 @@ describe('nextVaccinationDue', () => {
   });
 
   it('keeps the minimum gap when the course was started late', () => {
-    // The plan says 26 March, but the first dose only went in on 1 April; bunching the
-    // second dose four days later would be worse than useless.
+    // The next dose by age is 23 April, but the first went in on 1 April; bunching them
+    // three weeks apart would be worse than useless.
     expect(
       nextVaccinationDue(combined, { history: ['2026-04-01'], birthDate: '2026-01-01' }),
-    ).toEqual({ dueOn: '2026-04-29', stage: 'primary' });
+    ).toEqual({ dueOn: '2026-04-29', stage: 'primary_final' });
+  });
+
+  it('does not put a grown dog back on the puppy plan', () => {
+    // The owner entered only the latest booster. Counting records would see one dose
+    // against a four-dose plan and propose a second puppy shot for a six-year-old.
+    expect(
+      nextVaccinationDue(combined, { history: ['2026-09-01'], birthDate: '2020-01-01' }),
+    ).toEqual({ dueOn: '2029-09-01', stage: 'booster' });
+  });
+
+  it('tells an unvaccinated adult to start now, not in the year it was born', () => {
+    expect(
+      nextVaccinationDue(combined, {
+        history: [],
+        birthDate: '2020-01-01',
+        today: '2026-09-08',
+      }),
+    ).toEqual({ dueOn: '2026-09-08', stage: 'primary' });
+  });
+
+  it('still shows a puppy’s overdue first dose on its real date', () => {
+    expect(
+      nextVaccinationDue(combined, {
+        history: [],
+        birthDate: '2026-07-01',
+        today: '2026-09-08',
+      })?.dueOn,
+    ).toBe('2026-08-26');
   });
 
   it('keeps the closing booster on its age, not on a gap', () => {
@@ -130,5 +158,15 @@ describe('isPrimaryCourseComplete', () => {
   it('is true once every planned dose is recorded', () => {
     const history = ['2026-02-26', '2026-03-26', '2026-04-23', '2026-07-01'];
     expect(isPrimaryCourseComplete(combined, { history, birthDate: '2026-01-01' })).toBe(true);
+  });
+
+  it('is true for an adult whose last dose is past the whole plan', () => {
+    expect(
+      isPrimaryCourseComplete(combined, { history: ['2026-09-01'], birthDate: '2020-01-01' }),
+    ).toBe(true);
+  });
+
+  it('is false with nothing recorded at all', () => {
+    expect(isPrimaryCourseComplete(combined, { history: [], birthDate: '2026-01-01' })).toBe(false);
   });
 });

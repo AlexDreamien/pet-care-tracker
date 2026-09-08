@@ -90,14 +90,31 @@ export interface VaccinationContext {
   history: readonly IsoDate[];
   birthDate?: IsoDate | undefined;
   birthPrecision?: BirthDatePrecision | undefined;
+  /** Lets an unvaccinated adult be told to start now rather than years ago. */
+  today?: IsoDate | undefined;
+}
+
+/**
+ * The planned dose the animal has not had yet.
+ *
+ * Chosen by date rather than by how many rows exist. Counting would misread the common
+ * case of an adult whose owner entered only the latest booster: one record against a
+ * four-dose puppy plan would look like a primary course still in progress, and the app
+ * would propose a second puppy dose for a six-year-old dog.
+ */
+function nextPlannedDose(
+  plan: readonly PlannedDose[],
+  lastAdministered: IsoDate,
+): PlannedDose | null {
+  return plan.find((dose) => compareDates(dose.dueOn, lastAdministered) > 0) ?? null;
 }
 
 /**
  * When the next dose is due.
  *
  * Returns `null` only when there is nothing to compute from — no history and no birth
- * date. A date already in the past is still returned: overdue is a state the interface
- * needs to show, not an error.
+ * date. A date already in the past is otherwise returned as it stands: overdue is a state
+ * the interface needs to show, not an error.
  */
 export function nextVaccinationDue(
   definition: VaccineDefinition,
@@ -114,18 +131,26 @@ export function nextVaccinationDue(
   if (last === undefined) {
     const first = plan[0];
     // Without a birth date and without a history there is no anchor to schedule from.
-    return first ? { dueOn: first.dueOn, stage: first.stage } : null;
+    if (!first) return null;
+
+    const lastPlanned = plan[plan.length - 1] as PlannedDose;
+    // An adult that has never been vaccinated starts the course now, not in the year it
+    // was born.
+    if (context.today !== undefined && compareDates(lastPlanned.dueOn, context.today) < 0) {
+      return { dueOn: context.today, stage: 'primary' };
+    }
+    return { dueOn: first.dueOn, stage: first.stage };
   }
 
-  const nextPlanned = plan[history.length];
-  if (nextPlanned) {
+  const planned = nextPlannedDose(plan, last);
+  if (planned) {
     // An age-based dose keeps its age; a repeat of the primary series must also respect
     // the minimum gap, so a course started late does not bunch its doses together.
     const dueOn =
-      nextPlanned.stage === 'first_booster'
-        ? nextPlanned.dueOn
-        : maxDate(nextPlanned.dueOn, addWeeks(last, definition.primaryCourse.intervalWeeks));
-    return { dueOn, stage: nextPlanned.stage };
+      planned.stage === 'first_booster'
+        ? planned.dueOn
+        : maxDate(planned.dueOn, addWeeks(last, definition.primaryCourse.intervalWeeks));
+    return { dueOn, stage: planned.stage };
   }
 
   return {
@@ -134,12 +159,16 @@ export function nextVaccinationDue(
   };
 }
 
-/** Whether the animal has had every dose of the primary series. */
+/** Whether the animal is past every dose of the primary series. */
 export function isPrimaryCourseComplete(
   definition: VaccineDefinition,
   context: VaccinationContext,
 ): boolean {
-  if (context.birthDate === undefined) return context.history.length > 0;
+  const history = [...context.history].sort(compareDates);
+  const last = history[history.length - 1];
+  if (last === undefined) return false;
+  if (context.birthDate === undefined) return true;
+
   const plan = planPrimaryCourse(definition, context.birthDate, context.birthPrecision ?? 'exact');
-  return context.history.length >= plan.length;
+  return nextPlannedDose(plan, last) === null;
 }

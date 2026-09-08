@@ -190,6 +190,52 @@ export function todayIn(instant: Date, timeZone: string): IsoDate {
   return `${value('year')}-${value('month')}-${value('day')}`;
 }
 
+/** Minutes `timeZone` is ahead of UTC at a given instant. Negative west of Greenwich. */
+export function offsetMinutes(instant: Date, timeZone: string): number {
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    hour12: false,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).formatToParts(instant);
+
+  const value = (type: string): number => Number(parts.find((part) => part.type === type)?.value);
+  const asIfUtc = Date.UTC(
+    value('year'),
+    value('month') - 1,
+    value('day'),
+    value('hour') % 24,
+    value('minute'),
+    value('second'),
+  );
+
+  return (asIfUtc - instant.getTime()) / 60_000;
+}
+
+/**
+ * A wall-clock time in a zone, as the instant it actually happens.
+ *
+ * "The vet at 15:00" is a local time; the calendar needs a moment. The offset is looked up
+ * twice because the first guess can land on the wrong side of a daylight-saving change —
+ * an appointment the morning the clocks go forward would otherwise be an hour out.
+ */
+export function zonedDateTimeToInstant(date: IsoDate, time: string, timeZone: string): string {
+  const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(time);
+  if (!match) throw new RangeError(`not an HH:MM time: ${time}`);
+
+  const naive = Date.parse(`${date}T${time}:00.000Z`);
+  if (Number.isNaN(naive)) throw new RangeError(`not a valid date: ${date}`);
+
+  const firstGuess = naive - offsetMinutes(new Date(naive), timeZone) * 60_000;
+  const corrected = naive - offsetMinutes(new Date(firstGuess), timeZone) * 60_000;
+
+  return new Date(corrected).toISOString();
+}
+
 /**
  * The next occurrence of a month-and-day anniversary on or after `from`.
  *
