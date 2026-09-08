@@ -1,0 +1,27 @@
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Runtime data: SQLite database and uploaded files never belong in the repository
+data/
+uploads/
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Test and coverage output
+coverage/
+.tmp/

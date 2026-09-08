@@ -1,0 +1,35 @@
+{
+  "name": "pet-care-tracker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Self-hosted web app for pet owners: identity papers, medical record, body measurements and care schedule",
+  "license": "MIT",
+  "author": "Alek Dreamien <dreamien@gmail.com>",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --build --force",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "api": "npm run start -w @pet-care-tracker/api",
+    "api:dev": "npm run dev -w @pet-care-tracker/api",
+    "migrate": "npm run migrate -w @pet-care-tracker/api",
+    "web": "npm run dev -w @pet-care-tracker/web",
+    "build": "npm run build -w @pet-care-tracker/web"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.12",
+    "typescript": "^5.6.0",
+    "vitest": "^4.1.11"
+  }
+}
