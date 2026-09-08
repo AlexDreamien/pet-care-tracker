@@ -1,3 +1,6 @@
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import type { FastifyInstance, InjectOptions } from 'fastify';
 import { buildApp } from '../src/app';
 import { loadConfig } from '../src/config';
@@ -6,6 +9,7 @@ import { createDatabase, type Database } from '../src/db/client';
 export interface TestApp {
   app: FastifyInstance;
   database: Database;
+  uploadDir: string;
   /** Moves the injected clock, so anything time-dependent is deterministic. */
   setNow(instant: string): void;
   close(): Promise<void>;
@@ -13,10 +17,12 @@ export interface TestApp {
 
 export async function makeApp(startingAt = '2026-09-08T12:00:00Z'): Promise<TestApp> {
   const database = createDatabase();
+  const uploadDir = mkdtempSync(join(tmpdir(), 'pct-uploads-'));
   const config = loadConfig({
     NODE_ENV: 'test',
     PUBLIC_ORIGIN: 'http://localhost:5173',
     DATABASE_PATH: ':memory:',
+    UPLOAD_DIR: uploadDir,
   } as NodeJS.ProcessEnv);
 
   let now = new Date(startingAt);
@@ -25,12 +31,14 @@ export async function makeApp(startingAt = '2026-09-08T12:00:00Z'): Promise<Test
   return {
     app,
     database,
+    uploadDir,
     setNow: (instant) => {
       now = new Date(instant);
     },
     close: async () => {
       await app.close();
       database.close();
+      rmSync(uploadDir, { recursive: true, force: true });
     },
   };
 }

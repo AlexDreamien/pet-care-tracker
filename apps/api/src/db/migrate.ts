@@ -50,6 +50,16 @@ const STATEMENTS = [
   `CREATE UNIQUE INDEX IF NOT EXISTS sessions_token_hash_unique ON sessions (token_hash)`,
   `CREATE INDEX IF NOT EXISTS sessions_user_idx ON sessions (user_id)`,
 
+  `CREATE TABLE IF NOT EXISTS webauthn_flows (
+    id TEXT PRIMARY KEY,
+    purpose TEXT NOT NULL,
+    user_id TEXT REFERENCES users(id) ON DELETE CASCADE,
+    challenge TEXT NOT NULL,
+    created_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS webauthn_flows_expiry_idx ON webauthn_flows (expires_at)`,
+
   `CREATE TABLE IF NOT EXISTS households (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,

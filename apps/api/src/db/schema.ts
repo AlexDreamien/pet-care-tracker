@@ -73,6 +73,27 @@ export const sessions = sqliteTable(
   ],
 );
 
+/**
+ * One in-flight WebAuthn ceremony.
+ *
+ * The challenge has to be remembered between the two requests of a passkey flow, and it
+ * cannot live in memory: a deploy between the two halves would fail every login in
+ * progress. Rows are single-use and short-lived.
+ */
+export const webauthnFlows = sqliteTable(
+  'webauthn_flows',
+  {
+    id: id(),
+    purpose: text('purpose').notNull(),
+    /** Null for a usernameless login, where the user is only known after verification. */
+    userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }),
+    challenge: text('challenge').notNull(),
+    createdAt: createdAt(),
+    expiresAt: text('expires_at').notNull(),
+  },
+  (table) => [index('webauthn_flows_expiry_idx').on(table.expiresAt)],
+);
+
 export const households = sqliteTable('households', {
   id: id(),
   name: text('name').notNull(),
@@ -425,6 +446,7 @@ export const schema = {
   users,
   credentials,
   sessions,
+  webauthnFlows,
   households,
   householdMembers,
   files,

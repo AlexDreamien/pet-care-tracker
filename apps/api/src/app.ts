@@ -1,4 +1,5 @@
 import cookie from '@fastify/cookie';
+import multipart from '@fastify/multipart';
 import rateLimit from '@fastify/rate-limit';
 import Fastify, { type FastifyInstance } from 'fastify';
 import { ZodError } from 'zod';
@@ -6,6 +7,10 @@ import { resolveSession, SESSION_COOKIE } from './domain/auth';
 import type { AppContext } from './http/context';
 import { ApiError, toErrorBody, validationFailed } from './http/errors';
 import { registerAuthRoutes } from './routes/auth';
+import { registerPasskeyRoutes } from './routes/passkeys';
+import { registerFileRoutes } from './routes/files';
+import { registerHouseholdRoutes } from './routes/households';
+import { registerPetRoutes } from './routes/pets';
 
 export interface BuildAppOptions {
   context: AppContext;
@@ -23,6 +28,9 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
   });
 
   await app.register(cookie);
+  await app.register(multipart, {
+    limits: { fileSize: context.config.MAX_UPLOAD_BYTES, files: 1 },
+  });
   await app.register(rateLimit, {
     global: false,
     max: 300,
@@ -74,7 +82,16 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
 
   app.get('/api/v1/health', async () => ({ status: 'ok' }));
 
-  await app.register(async (api) => registerAuthRoutes(api, context), { prefix: '/api/v1' });
+  await app.register(
+    async (api) => {
+      registerAuthRoutes(api, context);
+      registerPasskeyRoutes(api, context);
+      registerHouseholdRoutes(api, context);
+      registerPetRoutes(api, context);
+      registerFileRoutes(api, context);
+    },
+    { prefix: '/api/v1' },
+  );
 
   return app;
 }
