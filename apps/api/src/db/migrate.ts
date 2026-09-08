@@ -4,12 +4,21 @@
  * Written by hand rather than generated, and kept honest by `tests/schema-parity.test.ts`,
  * which compares every table here against the Drizzle definitions column by column. That
  * test is the reason this file can be trusted; do not skip it when adding a column.
+ *
+ * `CREATE TABLE IF NOT EXISTS` creates; it never alters. On a database that already exists
+ * — which is every deployed one — adding a column to the statements below would silently do
+ * nothing, and the first index or query touching that column would fail at boot. That is
+ * exactly what happened once: an existing volume met `CREATE UNIQUE INDEX … (lost_token)`
+ * on a `pets` table that had no such column, and the application crash-looped. So the run
+ * order is: create missing tables, **add missing columns**, then create indexes.
  */
 
 import type BetterSqlite3 from 'better-sqlite3';
+import { getTableConfig } from 'drizzle-orm/sqlite-core';
+import { schema } from './schema';
 
-/** Bump when adding a statement below, so an existing database picks the change up. */
-export const SCHEMA_VERSION = 1;
+/** Stamped into `user_version` once a run completes. Informational, not a gate. */
+export const SCHEMA_VERSION = 2;
 
 const STATEMENTS = [
   `CREATE TABLE IF NOT EXISTS users (
@@ -315,11 +324,77 @@ const STATEMENTS = [
   `CREATE INDEX IF NOT EXISTS event_completions_event_idx ON event_completions (event_id)`,
 ];
 
-export function migrate(database: BetterSqlite3.Database): void {
+const isIndex = (statement: string) =>
+  statement.trimStart().startsWith('CREATE UNIQUE INDEX') ||
+  statement.trimStart().startsWith('CREATE INDEX');
+
+/** Renders a Drizzle column default as the literal an `ALTER TABLE` clause needs. */
+function defaultLiteral(value: unknown): string | null {
+  if (value === undefined || value === null) return null;
+  if (typeof value === 'boolean') return value ? '1' : '0';
+  if (typeof value === 'number') return String(value);
+  if (typeof value === 'string') return `'${value.replace(/'/g, "''")}'`;
+  return null;
+}
+
+/**
+ * Adds any column the Drizzle schema declares and the database does not have.
+ *
+ * The schema is the single source of truth here rather than a third hand-written list of
+ * `ALTER` statements, which would be one more thing to forget. Adding a column is
+ * idempotent: a database created from the current baseline already has them all and this
+ * pass does nothing.
+ */
+export function ensureColumns(database: BetterSqlite3.Database): string[] {
+  const added: string[] = [];
+
+  for (const table of Object.values(schema)) {
+    const config = getTableConfig(table);
+    const existing = new Set(
+      database
+        .prepare<[], { name: string }>(`PRAGMA table_info(${config.name})`)
+        .all()
+        .map((row) => row.name),
+    );
+
+    for (const column of config.columns) {
+      if (existing.has(column.name)) continue;
+
+      const literal = defaultLiteral(column.default);
+      if (column.notNull && literal === null) {
+        // SQLite cannot add a NOT NULL column without a default, and guessing one would
+        // put made-up data in existing rows.
+        throw new Error(
+          `cannot add ${config.name}.${column.name}: NOT NULL with no default. Give it a default or make it nullable.`,
+        );
+      }
+
+      const parts = [`ALTER TABLE ${config.name} ADD COLUMN ${column.name} ${column.getSQLType()}`];
+      if (column.notNull) parts.push('NOT NULL');
+      if (literal !== null) parts.push(`DEFAULT ${literal}`);
+
+      database.exec(parts.join(' '));
+      added.push(`${config.name}.${column.name}`);
+    }
+  }
+
+  return added;
+}
+
+export function migrate(database: BetterSqlite3.Database): string[] {
   database.exec('PRAGMA foreign_keys = ON');
+
+  let added: string[] = [];
   const apply = database.transaction(() => {
-    for (const statement of STATEMENTS) database.exec(statement);
+    // Tables first: an index cannot be created on a table that does not exist yet.
+    for (const statement of STATEMENTS.filter((s) => !isIndex(s))) database.exec(statement);
+    // Then the columns an older database is missing, so the indexes below can reference them.
+    added = ensureColumns(database);
+    for (const statement of STATEMENTS.filter(isIndex)) database.exec(statement);
+
     database.pragma(`user_version = ${SCHEMA_VERSION}`);
   });
   apply();
+
+  return added;
 }

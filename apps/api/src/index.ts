@@ -21,6 +21,11 @@ async function main(): Promise<void> {
     logger: true,
   });
 
+  // Altering a live database on boot should be visible in the log, not silent.
+  if (database.migrated.length > 0) {
+    app.log.info({ columns: database.migrated }, 'added columns to an existing database');
+  }
+
   const housekeeping = setInterval(() => {
     const now = new Date();
     purgeExpiredSessions(database, now);

@@ -6,6 +6,8 @@ import { schema } from './schema';
 export interface Database {
   sqlite: BetterSqlite3.Database;
   db: ReturnType<typeof drizzle<typeof schema>>;
+  /** Columns this open added to an existing database; empty for a fresh one. */
+  migrated: string[];
   close(): void;
 }
 
@@ -22,11 +24,12 @@ export function createDatabase(path = ':memory:'): Database {
   sqlite.pragma('busy_timeout = 5000');
   sqlite.pragma('foreign_keys = ON');
 
-  migrate(sqlite);
+  const migrated = migrate(sqlite);
 
   return {
     sqlite,
     db: drizzle(sqlite, { schema }),
+    migrated,
     close: () => sqlite.close(),
   };
 }
