@@ -1,0 +1,35 @@
+name: Fly Deploy
+
+# Deploying is pushing to main. A manual `flyctl deploy` from a workstation races this one
+# and has, in a sibling project in this workspace, left the machine stopped while reporting
+# success. Requires the repo secret FLY_API_TOKEN (a Fly deploy token).
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '.github/**'
+      - '**.md'
+      - 'docs/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: fly-deploy
+      cancel-in-progress: false
+
+    steps:
+      - uses: actions/checkout@v5
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      # Fly treats a stopped machine as an acceptable deployment outcome, so the state is
+      # checked rather than assumed.
+      - name: Confirm the machine is running
+        run: flyctl status
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

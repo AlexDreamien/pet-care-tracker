@@ -1,0 +1,47 @@
+# Fly.io deployment.
+#
+# One machine serving the API and the built front end from a single origin — which is what
+# lets the session cookie work without CORS and gives the service worker full scope. SQLite
+# and uploaded files share a persistent volume at /data.
+#
+# PUBLIC_ORIGIN is not decoration: WebAuthn binds every passkey to an origin, so changing
+# the hostname (a custom domain, say) invalidates existing passkeys. Passwords still work.
+
+app = "pet-care-tracker"
+primary_region = "fra"   # Frankfurt, the closest large EU region
+
+[build]
+
+[env]
+  NODE_ENV = "production"
+  HOST = "0.0.0.0"
+  PORT = "8080"
+  PUBLIC_ORIGIN = "https://pet-care-tracker.fly.dev"
+  DATABASE_PATH = "/data/pet-care-tracker.sqlite"
+  UPLOAD_DIR = "/data/uploads"
+  WEB_DIST = "/app/apps/web/dist"
+
+[mounts]
+  source = "pet_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  # A single machine with a volume: it may sleep, and a calendar client fetching the ICS
+  # feed wakes it. Suspend rather than stop so waking is fast.
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/api/v1/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  # sharp re-encodes uploaded photos; 512 MB is comfortable for one image at a time.
+  memory = "512mb"

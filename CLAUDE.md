@@ -17,7 +17,13 @@ npm run format:check      # prettier
 npm run api:dev           # Fastify with reload
 npm run web               # Vite dev server, proxying /api to the backend
 npm run build             # production bundle of apps/web
+npm run local             # one process, one origin — the shape production runs in
+npm run capture           # seed a demo household and photograph six screens
 ```
+
+`npm run local` is worth using before a deploy: development runs two servers behind a
+proxy, which is convenient but not what ships, and the single-origin path has broken on its
+own before. `npm run capture` needs `npm run local` already running.
 
 Run one test: `npx vitest run -t "<name>"`.
 
@@ -60,6 +66,18 @@ which plain `node` cannot resolve. Use the scripts, not `node src/…`.
 - **Month arithmetic must be end-of-month safe.** "Three months after 31 August" is
   30 November, not 1 December. `29 February` anniversaries fall on 28 February in common
   years. Both are unit-tested; keep them so.
+- **The agenda window starts today, so anything overdue must be carried into it.**
+  `datesInWindow` pulls an unmet date forward — at most one occurrence per recurring
+  series. Without it the home screen looks reassuringly empty while hiding exactly what is
+  late.
+- **`@theme` cannot be nested in a media query.** Tailwind 4 hoists the declarations out,
+  so a `@theme` inside `prefers-color-scheme: dark` silently overwrites the light palette
+  instead of qualifying it, and light mode ceases to exist. Dark mode overrides the emitted
+  variables with ordinary CSS in `styles.css`.
+- **Fastify allows one not-found handler per prefix.** `buildApp` owns it, and decides
+  between a JSON 404 and the SPA shell by looking at `WEB_DIST` and the path. Registering a
+  second one anywhere crashes the server at boot — a path that only runs in production,
+  which is why `tests/spa.test.ts` exists.
 - **Uploaded images are stripped of EXIF, GPS included, before storage.** A pet photo
   taken at home carries the owner's address.
 - **Storage is raw, presentation converts.** Weights are stored in kilograms and lengths in
