@@ -6,7 +6,15 @@ import { useResource, useToday } from '../app/hooks';
 import { useSession, useUser } from '../app/session';
 import { formatDate, formatRelativeDays, splitAgenda } from '../lib/format';
 import type { MessageKey } from '../lib/i18n';
-import { CakeIcon, DocumentIcon, PawIcon, PillIcon, ShieldIcon, SyringeIcon } from '../ui/icons';
+import {
+  BowlIcon,
+  CakeIcon,
+  DocumentIcon,
+  PawIcon,
+  PillIcon,
+  ShieldIcon,
+  SyringeIcon,
+} from '../ui/icons';
 import { Badge, Button, Card, Empty, SectionTitle } from '../ui/primitives';
 import { PasskeyOffer } from './PasskeyOffer';
 
@@ -15,6 +23,7 @@ const SOURCE_ICON: Record<string, (props: { className?: string }) => ReactNode> 
   parasite_treatment: ShieldIcon,
   document_expiry: DocumentIcon,
   medication_dose: PillIcon,
+  food_low: BowlIcon,
   birthday: CakeIcon,
   event: PawIcon,
 };
@@ -29,6 +38,7 @@ function itemLabel(item: AgendaItem, t: (key: MessageKey) => string): string {
     case 'event':
     case 'document_expiry':
     case 'medication_dose':
+    case 'food_low':
       return item.title;
     case 'birthday':
       return t('agenda.source.birthday');

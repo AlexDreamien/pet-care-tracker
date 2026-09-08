@@ -112,3 +112,22 @@ export function CakeIcon(props: IconProps): ReactNode {
     </Icon>
   );
 }
+
+export function WalletIcon(props: IconProps): ReactNode {
+  return (
+    <Icon {...props}>
+      <path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H17a2 2 0 0 1 2 2v1.5" />
+      <rect x="3" y="7.5" width="18" height="12" rx="2.5" />
+      <path d="M21 11.5h-4a2 2 0 0 0 0 4h4" />
+    </Icon>
+  );
+}
+
+export function BowlIcon(props: IconProps): ReactNode {
+  return (
+    <Icon {...props}>
+      <path d="M3.5 11h17a8.5 8.5 0 0 1-8.5 8 8.5 8.5 0 0 1-8.5-8Z" />
+      <path d="M8 7.5c0-1.4 1.8-1.4 1.8-2.8M12 7.5c0-1.4 1.8-1.4 1.8-2.8M16 7.5c0-1.4 1.8-1.4 1.8-2.8" />
+    </Icon>
+  );
+}

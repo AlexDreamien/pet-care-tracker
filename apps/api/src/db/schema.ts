@@ -106,6 +106,10 @@ export const households = sqliteTable('households', {
    * a member, because the calendar feed is fetched without anyone signed in.
    */
   timeZone: text('time_zone').notNull().default('UTC'),
+  /** The currency the expense summary totals in. Nothing is ever converted. */
+  currency: text('currency').notNull().default('RUB'),
+  /** Days of warning before an open bag of food runs out. */
+  foodLeadDays: integer('food_lead_days').notNull().default(5),
   createdAt: createdAt(),
 });
 
@@ -406,6 +410,49 @@ export const careEvents = sqliteTable(
   ],
 );
 
+// -- food and money -------------------------------------------------------------------------------
+
+export const foodBags = sqliteTable(
+  'food_bags',
+  {
+    id: id(),
+    petId: text('pet_id')
+      .notNull()
+      .references(() => pets.id, { onDelete: 'cascade' }),
+    brand: text('brand'),
+    name: text('name').notNull(),
+    weightGrams: integer('weight_grams').notNull(),
+    dailyGrams: real('daily_grams').notNull(),
+    openedOn: text('opened_on').notNull(),
+    /** Set when the bag is actually done, which is what corrects the next estimate. */
+    finishedOn: text('finished_on'),
+    price: real('price'),
+    currency: text('currency'),
+    notes: text('notes'),
+    createdAt: createdAt(),
+  },
+  (table) => [index('food_bags_pet_idx').on(table.petId, table.openedOn)],
+);
+
+export const expenses = sqliteTable(
+  'expenses',
+  {
+    id: id(),
+    householdId: text('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    /** Null for something the household shares rather than one animal. */
+    petId: text('pet_id').references(() => pets.id, { onDelete: 'set null' }),
+    category: text('category').notNull(),
+    amount: real('amount').notNull(),
+    currency: text('currency').notNull(),
+    spentOn: text('spent_on').notNull(),
+    note: text('note'),
+    createdAt: createdAt(),
+  },
+  (table) => [index('expenses_household_idx').on(table.householdId, table.spentOn)],
+);
+
 export const eventCompletions = sqliteTable(
   'event_completions',
   {
@@ -468,4 +515,6 @@ export const schema = {
   measurementTargets,
   careEvents,
   eventCompletions,
+  foodBags,
+  expenses,
 };

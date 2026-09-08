@@ -1,4 +1,8 @@
-import { inviteMemberSchema, reminderPreferenceSchema } from '@pet-care-tracker/core';
+import {
+  currencySchema,
+  inviteMemberSchema,
+  reminderPreferenceSchema,
+} from '@pet-care-tracker/core';
 import { eq } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
@@ -14,6 +18,8 @@ const updateSchema = z
     name: z.string().trim().min(1).max(80).optional(),
     /** Appointment times are written in this zone, and the ICS feed converts with it. */
     timeZone: z.string().trim().max(64).optional(),
+    currency: currencySchema.optional(),
+    foodLeadDays: z.number().int().min(0).max(60).optional(),
   })
   .and(reminderPreferenceSchema.partial());
 
@@ -48,6 +54,9 @@ export function registerHouseholdRoutes(app: FastifyInstance, context: AppContex
         name: household.name,
         reminderLeadDays: household.reminderLeadDays,
         reminderHour: household.reminderHour,
+        timeZone: household.timeZone,
+        currency: household.currency,
+        foodLeadDays: household.foodLeadDays,
         // The subscription URL is shown only to a member, and only the token is secret.
         calendarUrl: `${context.config.PUBLIC_ORIGIN}/api/v1/calendar/${household.calendarToken}.ics`,
       },
@@ -71,6 +80,8 @@ export function registerHouseholdRoutes(app: FastifyInstance, context: AppContex
       Object.entries({
         name: input.name,
         timeZone: input.timeZone,
+        currency: input.currency,
+        foodLeadDays: input.foodLeadDays,
         reminderLeadDays: input.leadDays,
         reminderHour: input.hour,
       }).filter(([, value]) => value !== undefined),

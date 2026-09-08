@@ -11,6 +11,7 @@ import {
   type AgendaInput,
   type BirthDatePrecision,
   type DerivedDueInput,
+  foodReminderDate,
   type IsoDate,
   nextBirthday,
   type RecurrenceRule,
@@ -19,7 +20,14 @@ import {
 } from '@pet-care-tracker/core';
 import { and, eq, gte, isNull, lte, ne } from 'drizzle-orm';
 import type { Database } from '../db/client';
-import { careEvents, documents, medicationCourses, medicationDoses, pets } from '../db/schema';
+import {
+  careEvents,
+  documents,
+  foodBags,
+  medicationCourses,
+  medicationDoses,
+  pets,
+} from '../db/schema';
 import { currentParasiteDues, currentVaccinationDues } from './medical';
 
 export interface AgendaSourceOptions {
@@ -29,6 +37,8 @@ export interface AgendaSourceOptions {
   petId?: string | undefined;
   /** The household's zone, so a wall-clock appointment becomes the right instant. */
   timeZone: string;
+  /** Days of warning before an open bag of food runs out. */
+  foodLeadDays: number;
   includeBirthdays?: boolean;
 }
 
@@ -110,6 +120,7 @@ export function collectAgendaInput(database: Database, options: AgendaSourceOpti
     }
 
     derived.push(...medicationDays(database, pet.id, pet.name, options));
+    derived.push(...foodRunningLow(database, pet, options));
 
     if (options.includeBirthdays !== false && pet.birthDate) {
       const birthday = nextBirthday(
@@ -185,6 +196,37 @@ function medicationDays(
   }
 
   return entries;
+}
+
+/**
+ * "Buy more food", a few days before the open bag runs out.
+ *
+ * The date is computed from the bag rather than stored, so correcting the ration moves the
+ * reminder instead of leaving a stale one behind.
+ */
+function foodRunningLow(
+  database: Database,
+  pet: { id: string; name: string },
+  options: AgendaSourceOptions,
+): DerivedDueInput[] {
+  const open = database.db
+    .select()
+    .from(foodBags)
+    .where(and(eq(foodBags.petId, pet.id), isNull(foodBags.finishedOn)))
+    .all();
+
+  return open.map((bag) => ({
+    id: bag.id,
+    petId: pet.id,
+    petName: pet.name,
+    source: 'food_low' as const,
+    title: bag.brand ? `${bag.brand} ${bag.name}` : bag.name,
+    dueOn: foodReminderDate(
+      { weightGrams: bag.weightGrams, dailyGrams: bag.dailyGrams, openedOn: bag.openedOn },
+      options.from,
+      options.foodLeadDays,
+    ),
+  }));
 }
 
 /**

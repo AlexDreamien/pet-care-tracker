@@ -111,6 +111,7 @@ async function seed() {
       reason: 'Хромота на переднюю лапу',
       findings: 'Растяжение связок, перелома нет',
       treatment: 'Покой 10 дней, противовоспалительное',
+      cost: 4200,
     },
   });
 
@@ -153,6 +154,30 @@ async function seed() {
     await call(`/pets/${rex.id}/measurements`, {
       method: 'POST',
       body: { metric, measuredOn: shift(days), value },
+    });
+  }
+
+  await call(`/pets/${rex.id}/food`, {
+    method: 'POST',
+    body: {
+      brand: 'Acana',
+      name: 'Adult Large Breed',
+      weightGrams: 11400,
+      dailyGrams: 420,
+      openedOn: shift(-19),
+      price: 6800,
+    },
+  });
+
+  for (const [category, amount, days, note] of [
+    ['grooming', 2500, -12, 'Стрижка когтей и уши'],
+    ['accessories', 3400, -40, 'Шлейка'],
+    ['medication', 1250, -3, 'Синулокс'],
+    ['insurance', 9600, -120, 'Полис на год'],
+  ]) {
+    await call('/expenses', {
+      method: 'POST',
+      body: { category, amount, spentOn: shift(days), petId: rex.id, note },
     });
   }
 
@@ -249,6 +274,8 @@ async function main() {
   await shoot(`/pets/${rex.id}`, 'pet-profile', 'text=Курица');
   await shoot(`/pets/${rex.id}/medical`, 'medical', 'text=Прививки');
   await shoot(`/pets/${rex.id}/measurements`, 'measurements', 'svg');
+  await shoot(`/pets/${rex.id}/food`, 'food', 'text=Открытая пачка');
+  await shoot('/expenses', 'expenses', 'text=Всего');
   await shoot('/settings', 'settings', 'text=Подписка на календарь');
 
   await browser.close();

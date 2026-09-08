@@ -67,6 +67,8 @@ const STATEMENTS = [
     reminder_lead_days INTEGER NOT NULL DEFAULT 2,
     reminder_hour INTEGER NOT NULL DEFAULT 9,
     time_zone TEXT NOT NULL DEFAULT 'UTC',
+    currency TEXT NOT NULL DEFAULT 'RUB',
+    food_lead_days INTEGER NOT NULL DEFAULT 5,
     created_at TEXT NOT NULL
   )`,
 
@@ -268,6 +270,35 @@ const STATEMENTS = [
   )`,
   `CREATE INDEX IF NOT EXISTS care_events_pet_idx ON care_events (pet_id)`,
   `CREATE INDEX IF NOT EXISTS care_events_scheduled_idx ON care_events (scheduled_on)`,
+
+  `CREATE TABLE IF NOT EXISTS food_bags (
+    id TEXT PRIMARY KEY,
+    pet_id TEXT NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
+    brand TEXT,
+    name TEXT NOT NULL,
+    weight_grams INTEGER NOT NULL,
+    daily_grams REAL NOT NULL,
+    opened_on TEXT NOT NULL,
+    finished_on TEXT,
+    price REAL,
+    currency TEXT,
+    notes TEXT,
+    created_at TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS food_bags_pet_idx ON food_bags (pet_id, opened_on)`,
+
+  `CREATE TABLE IF NOT EXISTS expenses (
+    id TEXT PRIMARY KEY,
+    household_id TEXT NOT NULL REFERENCES households(id) ON DELETE CASCADE,
+    pet_id TEXT REFERENCES pets(id) ON DELETE SET NULL,
+    category TEXT NOT NULL,
+    amount REAL NOT NULL,
+    currency TEXT NOT NULL,
+    spent_on TEXT NOT NULL,
+    note TEXT,
+    created_at TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS expenses_household_idx ON expenses (household_id, spent_on)`,
 
   `CREATE TABLE IF NOT EXISTS event_completions (
     id TEXT PRIMARY KEY,

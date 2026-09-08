@@ -328,6 +328,62 @@ export const reminderPreferenceSchema = z.object({
   hour: z.number().int().min(0).max(23).default(9),
 });
 
+// -- food and money ---------------------------------------------------------------------------
+
+/** ISO 4217-shaped: three letters, upper-cased. No conversion happens anywhere. */
+export const currencySchema = z
+  .string()
+  .trim()
+  .toUpperCase()
+  .regex(/^[A-Z]{3}$/, 'expected a three-letter currency code');
+
+export const foodBagSchema = z
+  .object({
+    brand: optionalText(80),
+    name: requiredText(120),
+    /** Net weight of the bag. Grams keep the arithmetic in integers. */
+    weightGrams: z.number().int().min(1).max(200_000),
+    /** The daily ration; the only figure the forecast really depends on. */
+    dailyGrams: z.number().min(1).max(5_000),
+    openedOn: isoDateSchema,
+    finishedOn: isoDateSchema.optional(),
+    price: z.number().nonnegative().max(1_000_000).optional(),
+    currency: currencySchema.optional(),
+    notes: optionalText(500),
+  })
+  .refine((bag) => bag.finishedOn === undefined || bag.finishedOn >= bag.openedOn, {
+    message: 'a bag cannot be finished before it was opened',
+    path: ['finishedOn'],
+  });
+
+export const expenseCategorySchema = z.enum([
+  'food',
+  'vet',
+  'medication',
+  'grooming',
+  'accessories',
+  'insurance',
+  'training',
+  'boarding',
+  'other',
+]);
+
+export const expenseSchema = z.object({
+  /** Absent for something the whole household shares, such as a carrier. */
+  petId: z.uuid().optional(),
+  category: expenseCategorySchema,
+  amount: z.number().positive().max(10_000_000),
+  currency: currencySchema.optional(),
+  spentOn: isoDateSchema,
+  note: optionalText(300),
+});
+
+export const expenseQuerySchema = z.object({
+  from: isoDateSchema,
+  to: isoDateSchema,
+  petId: z.uuid().optional(),
+});
+
 export const agendaQuerySchema = z.object({
   from: isoDateSchema,
   to: isoDateSchema,
@@ -349,3 +405,5 @@ export type MeasurementTargetInput = z.infer<typeof measurementTargetSchema>;
 export type ContactInput = z.infer<typeof contactSchema>;
 export type CareEventInput = z.infer<typeof careEventSchema>;
 export type ReminderPreferenceInput = z.infer<typeof reminderPreferenceSchema>;
+export type FoodBagInput = z.infer<typeof foodBagSchema>;
+export type ExpenseInput = z.infer<typeof expenseSchema>;

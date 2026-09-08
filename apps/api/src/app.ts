@@ -14,6 +14,8 @@ import { registerAgendaRoutes } from './routes/agenda';
 import { registerContactRoutes } from './routes/contacts';
 import { registerDocumentRoutes } from './routes/documents';
 import { registerEventRoutes } from './routes/events';
+import { registerExpenseRoutes } from './routes/expenses';
+import { registerFoodRoutes } from './routes/food';
 import { registerExportRoutes } from './routes/export';
 import { registerFileRoutes } from './routes/files';
 import { registerHouseholdRoutes } from './routes/households';
@@ -118,6 +120,8 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
       registerMeasurementRoutes(api, context);
       registerContactRoutes(api, context);
       registerEventRoutes(api, context);
+      registerFoodRoutes(api, context);
+      registerExpenseRoutes(api, context);
       registerAgendaRoutes(api, context);
       registerExportRoutes(api, context);
     },

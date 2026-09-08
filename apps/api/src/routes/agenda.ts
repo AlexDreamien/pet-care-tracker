@@ -33,6 +33,7 @@ export function registerAgendaRoutes(app: FastifyInstance, context: AppContext):
       to: query.to,
       petId: query.petId,
       timeZone: household.timeZone,
+      foodLeadDays: household.foodLeadDays,
     });
 
     return {
@@ -69,6 +70,7 @@ export function registerAgendaRoutes(app: FastifyInstance, context: AppContext):
       from: window.from,
       to: window.to,
       timeZone: household.timeZone,
+      foodLeadDays: household.foodLeadDays,
     });
 
     const document = buildCalendar(

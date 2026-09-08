@@ -8,6 +8,7 @@ import type { MessageKey } from '../lib/i18n';
 import { Badge, Card } from '../ui/primitives';
 import { PetAvatar } from './PetsPage';
 import { DocumentsTab } from './pet/DocumentsTab';
+import { FoodTab } from './pet/FoodTab';
 import { MeasurementsTab } from './pet/MeasurementsTab';
 import { MedicalTab } from './pet/MedicalTab';
 import { ProfileTab } from './pet/ProfileTab';
@@ -17,6 +18,7 @@ const TABS: { path: string; key: MessageKey }[] = [
   { path: '', key: 'tab.profile' },
   { path: 'medical', key: 'tab.medical' },
   { path: 'measurements', key: 'tab.measurements' },
+  { path: 'food', key: 'tab.food' },
   { path: 'documents', key: 'tab.documents' },
   { path: 'schedule', key: 'tab.schedule' },
 ];
@@ -97,6 +99,7 @@ export function PetPage(): ReactNode {
         <Route index element={<ProfileTab pet={record} onChanged={pet.reload} />} />
         <Route path="medical" element={<MedicalTab pet={record} onChanged={pet.reload} />} />
         <Route path="measurements" element={<MeasurementsTab pet={record} />} />
+        <Route path="food" element={<FoodTab pet={record} />} />
         <Route path="documents" element={<DocumentsTab pet={record} />} />
         <Route path="schedule" element={<ScheduleTab pet={record} />} />
         <Route path="*" element={<Navigate to={`/pets/${record.id}`} replace />} />

@@ -4,17 +4,19 @@ import { useOnline } from './app/hooks';
 import { useSession } from './app/session';
 import { AgendaPage } from './pages/AgendaPage';
 import { ContactsPage } from './pages/ContactsPage';
+import { ExpensesPage } from './pages/ExpensesPage';
 import { PetPage } from './pages/PetPage';
 import { PetsPage } from './pages/PetsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { SignInPage } from './pages/SignInPage';
 import type { MessageKey } from './lib/i18n';
-import { CalendarIcon, ContactsIcon, PawIcon, SettingsIcon } from './ui/icons';
+import { CalendarIcon, ContactsIcon, PawIcon, SettingsIcon, WalletIcon } from './ui/icons';
 
 const TABS: { to: string; key: MessageKey; Icon: (props: { className?: string }) => ReactNode }[] =
   [
     { to: '/', key: 'nav.agenda', Icon: CalendarIcon },
     { to: '/pets', key: 'nav.pets', Icon: PawIcon },
+    { to: '/expenses', key: 'nav.expenses', Icon: WalletIcon },
     { to: '/contacts', key: 'nav.contacts', Icon: ContactsIcon },
     { to: '/settings', key: 'nav.settings', Icon: SettingsIcon },
   ];
@@ -52,6 +54,7 @@ export function App(): ReactNode {
           <Route path="/" element={<AgendaPage />} />
           <Route path="/pets" element={<PetsPage />} />
           <Route path="/pets/:petId/*" element={<PetPage />} />
+          <Route path="/expenses" element={<ExpensesPage />} />
           <Route path="/contacts" element={<ContactsPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />

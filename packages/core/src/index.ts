@@ -9,6 +9,8 @@ export * from './bcs';
 export * from './vaccination';
 export * from './parasite';
 export * from './medication';
+export * from './food';
+export * from './expenses';
 export * from './ics';
 export * from './agenda';
 export * from './schemas';

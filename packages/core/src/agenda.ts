@@ -21,6 +21,7 @@ export type AgendaSource =
   | 'parasite_treatment'
   | 'document_expiry'
   | 'medication_dose'
+  | 'food_low'
   | 'birthday';
 
 export interface ScheduledEventInput {
