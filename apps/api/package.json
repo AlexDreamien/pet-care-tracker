@@ -1,0 +1,33 @@
+{
+  "name": "@pet-care-tracker/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fastify backend: accounts, pets, medical record, measurements, agenda and calendar feed",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "migrate": "tsx src/db/migrate.ts",
+    "typecheck": "tsc --build"
+  },
+  "dependencies": {
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/multipart": "^9.2.1",
+    "@fastify/rate-limit": "^10.3.0",
+    "@fastify/static": "^10.1.3",
+    "@node-rs/argon2": "^2.2.0",
+    "@pet-care-tracker/catalog": "0.1.0",
+    "@pet-care-tracker/core": "0.1.0",
+    "@simplewebauthn/server": "^13.2.2",
+    "better-sqlite3": "^12.11.1",
+    "drizzle-orm": "^0.45.2",
+    "fastify": "^5.12.0",
+    "sharp": "^0.35.4",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0"
+  }
+}

@@ -10,3 +10,4 @@ export * from './vaccination';
 export * from './parasite';
 export * from './ics';
 export * from './agenda';
+export * from './schemas';
