@@ -216,6 +216,15 @@ async function seed() {
     },
   });
 
+  const tag = await call(`/pets/${rex.id}/lost-tag`, {
+    method: 'PUT',
+    body: {
+      contactName: 'Алек',
+      contactPhone: '+7 999 123-45-67',
+      note: 'Боится людей — не ловите, позвоните',
+    },
+  });
+
   await call('/contacts', {
     method: 'POST',
     body: {
@@ -231,11 +240,11 @@ async function seed() {
     body: { kind: 'groomer', name: 'Салон «Пушистик»', phone: '+7 999 765-43-21' },
   });
 
-  return { rex, musya };
+  return { rex, musya, tag };
 }
 
 async function main() {
-  const { rex } = await seed();
+  const { rex, tag } = await seed();
   await mkdir(OUT, { recursive: true });
 
   const scheme = process.env.COLOR_SCHEME === 'dark' ? 'dark' : 'light';
@@ -277,6 +286,27 @@ async function main() {
   await shoot(`/pets/${rex.id}/food`, 'food', 'text=Открытая пачка');
   await shoot('/expenses', 'expenses', 'text=Всего');
   await shoot('/settings', 'settings', 'text=Подписка на календарь');
+  await shoot(`/pets/${rex.id}/print/card?preview`, 'emergency-card', 'text=Аллергия');
+  await shoot(`/pets/${rex.id}/print/tag?preview`, 'lost-tag', 'svg');
+
+  // The public page, seen by a stranger with no session at all.
+  const anonymous = await browser.newContext({
+    viewport: { width: 414, height: 896 },
+    deviceScaleFactor: 2,
+    locale: 'ru-RU',
+    colorScheme: scheme,
+    isMobile: true,
+    hasTouch: true,
+  });
+  const strangerPage = await anonymous.newPage();
+  strangerPage.on('pageerror', (error) => problems.push(String(error)));
+  await strangerPage.goto(new URL(tag.url).pathname.replace(/^/, BASE), {
+    waitUntil: 'networkidle',
+  });
+  await strangerPage.waitForSelector('text=Я потерялся', { timeout: 10_000 });
+  await strangerPage.screenshot({ path: `${OUT}/found.png` });
+  console.log('found.png');
+  await anonymous.close();
 
   await browser.close();
 

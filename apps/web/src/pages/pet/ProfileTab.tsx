@@ -1,6 +1,6 @@
 import { formatMicrochip } from '@pet-care-tracker/core';
 import { type ReactNode, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../../api/client';
 import type { Pet, StoredFileSummary } from '../../api/types';
 import { useAction } from '../../app/hooks';
@@ -8,7 +8,8 @@ import { useSession } from '../../app/session';
 import { PetForm, petToValues, valuesToPayload } from '../../components/PetForm';
 import { formatDate } from '../../lib/format';
 import type { MessageKey } from '../../lib/i18n';
-import { Button, Card, Sheet } from '../../ui/primitives';
+import { Button, Card, SectionTitle, Sheet } from '../../ui/primitives';
+import { LostTagSection } from './LostTagSection';
 
 function Row({ label, value }: { label: string; value: ReactNode }): ReactNode {
   if (value === null || value === undefined || value === '') return null;
@@ -116,6 +117,21 @@ export function ProfileTab({ pet, onChanged }: { pet: Pet; onChanged: () => void
           </Button>
         </div>
       )}
+
+      <section>
+        <SectionTitle>{t('card.title')}</SectionTitle>
+        <Card>
+          <p className="mb-3 text-sm text-muted">{t('card.body')}</p>
+          <Link
+            to={`/pets/${pet.id}/print/card`}
+            className="inline-flex min-h-11 items-center rounded-xl border border-line bg-surface px-4 text-sm font-medium"
+          >
+            {t('card.print')}
+          </Link>
+        </Card>
+      </section>
+
+      <LostTagSection pet={pet} />
 
       <Sheet title={t('action.edit')} open={editing} onClose={() => setEditing(false)}>
         <PetForm

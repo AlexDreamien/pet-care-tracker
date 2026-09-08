@@ -20,6 +20,32 @@ const ru = {
   'nav.expenses': 'Расходы',
 
   'tab.food': 'Питание',
+
+  'found.title': 'Я потерялся',
+  'found.call': 'Позвонить',
+  'found.thanks': 'Спасибо, что помогаете нас найти',
+  'found.unknown': 'Такой жетон не найден. Возможно, его отключили.',
+
+  'lost.title': 'Жетон «я потерялся»',
+  'lost.body':
+    'QR-код на ошейник. Кто нашёл — сканирует и звонит вам. На странице только кличка, фото и ваш телефон: ничего из медкнижки туда не попадает.',
+  'lost.contactName': 'Кому звонить',
+  'lost.contactPhone': 'Телефон',
+  'lost.note': 'Что важно сообщить',
+  'lost.noteHint':
+    'Ваши слова, никаких автоматических данных. Например: «Боится людей, не ловите — позвоните».',
+  'lost.enable': 'Включить жетон',
+  'lost.disable': 'Выключить',
+  'lost.rotate': 'Сменить ссылку',
+  'lost.rotateHint': 'Старый жетон перестанет работать — если он потерялся вместе с ошейником.',
+  'lost.print': 'Распечатать жетон',
+  'lost.printHint': 'Печать → «Сохранить в PDF», если нужен файл',
+
+  'card.title': 'Экстренная карточка',
+  'card.body':
+    'Одна страница для клиники: чип, аллергии, что сейчас принимает, когда прививки. Печатается или сохраняется в PDF.',
+  'card.print': 'Открыть карточку',
+
   'food.new': 'Новая пачка',
   'food.brand': 'Марка',
   'food.name': 'Корм',
@@ -345,6 +371,32 @@ const en: Record<MessageKey, string> = {
   'nav.expenses': 'Spending',
 
   'tab.food': 'Food',
+
+  'found.title': 'I am lost',
+  'found.call': 'Call',
+  'found.thanks': 'Thank you for helping to find us',
+  'found.unknown': 'No such tag. It may have been turned off.',
+
+  'lost.title': 'Lost-pet tag',
+  'lost.body':
+    'A QR code for the collar. Whoever finds the animal scans it and calls you. The page shows a name, a photo and your number — nothing from the medical record goes there.',
+  'lost.contactName': 'Who to call',
+  'lost.contactPhone': 'Phone',
+  'lost.note': 'What a finder should know',
+  'lost.noteHint':
+    'Your words, nothing automatic. For example: “Nervous of people — please call rather than chase.”',
+  'lost.enable': 'Turn the tag on',
+  'lost.disable': 'Turn it off',
+  'lost.rotate': 'Replace the link',
+  'lost.rotateHint': 'The old tag stops working — for when it was lost along with the collar.',
+  'lost.print': 'Print the tag',
+  'lost.printHint': 'Print → Save as PDF if you want a file',
+
+  'card.title': 'Emergency card',
+  'card.body':
+    'One page for a consulting room: chip, allergies, what the animal is taking, recent vaccinations. Print it or save it as a PDF.',
+  'card.print': 'Open the card',
+
   'food.new': 'New bag',
   'food.brand': 'Brand',
   'food.name': 'Food',

@@ -4,6 +4,8 @@ import { useOnline } from './app/hooks';
 import { useSession } from './app/session';
 import { AgendaPage } from './pages/AgendaPage';
 import { ContactsPage } from './pages/ContactsPage';
+import { FoundPage } from './pages/FoundPage';
+import { CardPrintPage, TagPrintPage } from './pages/pet/PrintPages';
 import { ExpensesPage } from './pages/ExpensesPage';
 import { PetPage } from './pages/PetPage';
 import { PetsPage } from './pages/PetsPage';
@@ -34,6 +36,16 @@ function OfflineBanner(): ReactNode {
 }
 
 export function App(): ReactNode {
+  return (
+    <Routes>
+      {/* Public, and outside the sign-in gate: whoever found the animal has no account. */}
+      <Route path="/found/:token" element={<FoundPage />} />
+      <Route path="*" element={<SignedInApp />} />
+    </Routes>
+  );
+}
+
+function SignedInApp(): ReactNode {
   const { status, t } = useSession();
 
   if (status === 'loading') {
@@ -53,6 +65,8 @@ export function App(): ReactNode {
         <Routes>
           <Route path="/" element={<AgendaPage />} />
           <Route path="/pets" element={<PetsPage />} />
+          <Route path="/pets/:petId/print/tag" element={<TagPrintPage />} />
+          <Route path="/pets/:petId/print/card" element={<CardPrintPage />} />
           <Route path="/pets/:petId/*" element={<PetPage />} />
           <Route path="/expenses" element={<ExpensesPage />} />
           <Route path="/contacts" element={<ContactsPage />} />

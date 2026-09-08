@@ -5,9 +5,14 @@ measurements and care schedule in one place — installable to a phone's home sc
 readable when there is no signal.
 
 <p align="center">
-  <img src="docs/screenshots/agenda.png" alt="Today's agenda, with overdue items first" width="270">
-  <img src="docs/screenshots/measurements.png" alt="Weight charted against a target range, with a size card" width="270">
-  <img src="docs/screenshots/medical.png" alt="Vaccinations and antiparasitic treatments with computed next-due dates" width="270">
+  <img src="docs/screenshots/agenda.png" alt="Today's agenda, with overdue items first" width="260">
+  <img src="docs/screenshots/measurements.png" alt="Weight charted against a target range, with a size card" width="260">
+  <img src="docs/screenshots/medical.png" alt="Vaccinations and antiparasitic treatments with computed next-due dates" width="260">
+</p>
+<p align="center">
+  <img src="docs/screenshots/expenses.png" alt="A year of spending by category" width="260">
+  <img src="docs/screenshots/found.png" alt="What a stranger sees after scanning the lost-pet tag" width="260">
+  <img src="docs/screenshots/emergency-card.png" alt="The printable emergency card for a consulting room" width="260">
 </p>
 
 ## Why
@@ -37,6 +42,16 @@ labelled with how old it is, for the moment you are standing in a shop holding a
 **Calendar and reminders.** Care events with two kinds of recurrence, a contact book of
 vets and groomers with one-tap calling, and an **ICS feed** you subscribe to from your
 phone's calendar so reminders arrive natively.
+
+**Lost-pet tag.** A QR code for the collar. Whoever finds the animal scans it and gets one
+screen with one action: call the owner. The page shows a name, a photo and a number — the
+note is the owner's own words, so nothing from the medical record can reach it by accident,
+and the microchip is deliberately absent (a finder cannot use it, a vet scans the animal
+anyway). The token is replaceable, for when the tag comes off in a park.
+
+**Emergency card.** The opposite disclosure choice: one printable page for a consulting
+room, handed over in person, carrying the chip, the allergies, what the animal is currently
+taking and when it was last vaccinated.
 
 **Sharing.** A household, not an account, owns the pets — so adding a partner is adding a
 member, with an editor or read-only role.
@@ -181,8 +196,12 @@ integrations with specific clinic systems. Offline writes are also out of scope 
 fall back to a cached copy, but a change that cannot reach the server fails loudly rather
 than sitting in a queue an owner cannot see.
 
-Planned next: food tracking with bag-depletion forecasting, expense summaries, a QR
-lost-pet tag, a temporary link for a sitter, and a PDF medical summary.
+Planned next: a temporary link for a sitter, lab-result trends, and web push alongside the
+calendar feed.
+
+PDFs are produced by the browser's own print dialog rather than by a PDF library: "Save as
+PDF" embeds the system's Cyrillic fonts correctly, which a JavaScript PDF writer would have
+to be taught to do and would get subtly wrong.
 
 ## Licence
 

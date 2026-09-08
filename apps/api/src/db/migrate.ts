@@ -116,12 +116,17 @@ const STATEMENTS = [
     neutered_on TEXT,
     avatar_file_id TEXT REFERENCES files(id) ON DELETE SET NULL,
     notes TEXT,
+    lost_token TEXT,
+    lost_contact_name TEXT,
+    lost_contact_phone TEXT,
+    lost_note TEXT,
     archived_at TEXT,
     deceased_on TEXT,
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS pets_household_idx ON pets (household_id)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS pets_lost_token_unique ON pets (lost_token)`,
 
   `CREATE TABLE IF NOT EXISTS contacts (
     id TEXT PRIMARY KEY,

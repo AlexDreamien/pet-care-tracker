@@ -187,6 +187,18 @@ export const petSchema = z
     },
   );
 
+/**
+ * What a stranger who found the animal is shown.
+ *
+ * Nothing is pulled from the medical record: the note is the owner's own words, so a
+ * public page can never disclose something they did not choose to write on it.
+ */
+export const lostTagSchema = z.object({
+  contactName: requiredText(80),
+  contactPhone: requiredText(40),
+  note: optionalText(500),
+});
+
 // -- documents and medical record --------------------------------------------------------
 
 export const documentSchema = z
@@ -409,3 +421,4 @@ export type CareEventInput = z.infer<typeof careEventSchema>;
 export type ReminderPreferenceInput = z.infer<typeof reminderPreferenceSchema>;
 export type FoodBagInput = z.infer<typeof foodBagSchema>;
 export type ExpenseInput = z.infer<typeof expenseSchema>;
+export type LostTagInput = z.infer<typeof lostTagSchema>;

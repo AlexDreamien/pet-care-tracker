@@ -84,3 +84,37 @@ textarea {
     transition-duration: 0.01ms !important;
   }
 }
+
+/**
+ * Paper.
+ *
+ * The print routes render their own sheet; everything else on the page is chrome that
+ * would only waste ink. Colours are forced to black on white because a tag photocopied at
+ * a shelter has to still scan.
+ */
+@media print {
+  html {
+    padding: 0;
+    background: #ffffff;
+    color: #000000;
+  }
+
+  nav,
+  .no-print {
+    display: none !important;
+  }
+
+  main {
+    padding: 0 !important;
+    max-width: none !important;
+  }
+
+  .print-sheet {
+    color: #000000;
+  }
+
+  /* A tag split across two sheets scans as neither. */
+  .print-sheet > * {
+    break-inside: avoid;
+  }
+}

@@ -177,12 +177,24 @@ export const pets = sqliteTable(
     neuteredOn: text('neutered_on'),
     avatarFileId: text('avatar_file_id').references(() => files.id, { onDelete: 'set null' }),
     notes: text('notes'),
+    /**
+     * The lost-tag token. Null until the owner turns the tag on, and replaceable — a tag
+     * that fell off a collar in a park is a URL somebody else now holds.
+     */
+    lostToken: text('lost_token'),
+    lostContactName: text('lost_contact_name'),
+    lostContactPhone: text('lost_contact_phone'),
+    /** The owner's own words, so nothing medical is disclosed by accident. */
+    lostNote: text('lost_note'),
     archivedAt: text('archived_at'),
     deceasedOn: text('deceased_on'),
     createdAt: createdAt(),
     updatedAt: text('updated_at').notNull(),
   },
-  (table) => [index('pets_household_idx').on(table.householdId)],
+  (table) => [
+    index('pets_household_idx').on(table.householdId),
+    uniqueIndex('pets_lost_token_unique').on(table.lostToken),
+  ],
 );
 
 // -- contacts --------------------------------------------------------------------------------
