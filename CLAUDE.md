@@ -18,7 +18,7 @@ npm run api:dev           # Fastify with reload
 npm run web               # Vite dev server, proxying /api to the backend
 npm run build             # production bundle of apps/web
 npm run local             # one process, one origin — the shape production runs in
-npm run capture           # seed a demo household and photograph six screens
+npm run capture           # seed a demo household and photograph every screen
 ```
 
 `npm run local` is worth using before a deploy: development runs two servers behind a
@@ -80,6 +80,16 @@ which plain `node` cannot resolve. Use the scripts, not `node src/…`.
   which is why `tests/spa.test.ts` exists.
 - **Uploaded images are stripped of EXIF, GPS included, before storage.** A pet photo
   taken at home carries the owner's address.
+- **The lost tag and the emergency card disclose different things on purpose.** The tag is
+  public and shows only what the owner typed; nothing is read from the medical record and
+  the microchip is omitted. The card is handed over in person and carries all of it. Do not
+  "helpfully" add allergies to the public page — a free-text note is the owner's choice and
+  the only thing that belongs there.
+- **A public page serves its photo by token, never by file id.** Handing out a file id lets
+  a stranger walk the household's other files.
+- **Printing is the browser's job.** The print routes render a sheet and call `window.print`;
+  `?preview` suppresses the dialog. A PDF library would have to be taught to embed Cyrillic
+  fonts and would get it subtly wrong.
 - **Storage is raw, presentation converts.** Weights are stored in kilograms and lengths in
   centimetres; kg/lb and cm/in are a display concern in `packages/core` formatters. Storing
   a converted value breaks every past reading.

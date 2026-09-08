@@ -53,11 +53,18 @@ the README and in the UI where schedules are proposed.
 Each block ships complete: schema, pure domain logic with unit tests, API routes with
 route tests, UI, and a README section. Block N is finished before block N+1 starts.
 
-### Later — deliberately after Phase 1
+### Phase 2 — shipped
 
-Food tracking with bag-depletion forecasting; expense tracking and yearly summary; QR
-lost-pet tag with a public page; temporary sitter link; PDF medical summary export;
-lab-result trends; heat/pregnancy cycles; web push.
+Food tracking with bag-depletion forecasting; expense summaries merged from expense rows,
+vet fees and food prices; the QR lost-pet tag with its public page; the printable emergency
+card. PDFs come from the browser's print dialog rather than a PDF library — "Save as PDF"
+embeds the system's Cyrillic fonts correctly, which a JavaScript PDF writer would have to
+be taught to do and would get subtly wrong.
+
+### Later — still ahead
+
+Temporary sitter link; lab-result trends; heat and pregnancy cycles; web push alongside the
+calendar feed.
 
 ### Out of scope — not planned
 
@@ -136,6 +143,23 @@ to draw the corridor on the chart and to flag a reading outside it.
 
 The current neck girth, chest girth and back length together form the **size card**, the
 one screen an owner opens in a shop when buying a harness or a coat.
+
+### The two public surfaces
+
+Both are reached by an opaque token and neither needs a session. They exist for different
+readers and therefore disclose different things — which is the whole design, not an
+oversight.
+
+- **Calendar feed** (`households.calendar_token`) — titles and dates for a calendar client.
+  No medical detail.
+- **Lost tag** (`pets.lost_token`) — a name, a photo, the owner's chosen contact and a note
+  they wrote themselves. Nothing is read from the medical record, and the microchip is
+  omitted: a finder cannot use it, a vet scans the animal anyway, and it is a lookup key in
+  national registries. The photo is served by tag token, never by file id, so the URL
+  cannot be walked into the household's other files.
+
+Both tokens are replaceable, and replacing one invalidates what was printed or subscribed —
+the honest cost of revocation.
 
 ### Calendar and contacts
 
