@@ -46,9 +46,11 @@ which plain `node` cannot resolve. Use the scripts, not `node src/…`.
   done. Antiparasitic treatment and nail trims need the second — scheduling them from the
   planned date silently drifts wrong. An `after_completion` rule cannot be expressed as an
   ICS `RRULE`; it is emitted as a single dated event on purpose.
-- **`GET /agenda` and the ICS feed must use the same core function.** Merging scheduled
-  events with dates derived from `next_due_at` and document expiry happens once, in
-  `packages/core`. Two implementations would let the calendar and the app disagree.
+- **`GET /agenda` and the ICS feed must both go through `collectSeries`.** Merging
+  scheduled events with dates derived from `next_due_at` and document expiry happens once,
+  in `packages/core/src/agenda.ts`; `buildAgenda` and `buildCalendarEvents` are two
+  projections of its output. Two merges would let the calendar and the app disagree, and
+  `agenda.test.ts` asserts they produce the same dates for a rule that has to be expanded.
 - **Derived reminders are not rows.** A document expiry and a `next_due_at` produce agenda
   items by computation, not by inserting a `CareEvent`. Materialising them creates
   duplicates that outlive the record they came from.
