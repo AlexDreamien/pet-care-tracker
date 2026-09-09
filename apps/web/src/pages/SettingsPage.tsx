@@ -6,6 +6,7 @@ import { useAction, useResource } from '../app/hooks';
 import { useSession, useUser } from '../app/session';
 import { formatDate } from '../lib/format';
 import { LOCALES, type MessageKey } from '../lib/i18n';
+import { NotificationsSection } from './NotificationsSection';
 import { SitterLinksSection } from './SitterLinksSection';
 import { Button, Card, Field, Input, Select, SectionTitle } from '../ui/primitives';
 
@@ -41,6 +42,8 @@ export function SettingsPage(): ReactNode {
           <MembersCard detail={detail.data} onChanged={detail.reload} />
         </>
       )}
+
+      <NotificationsSection />
 
       <SitterLinksSection />
 

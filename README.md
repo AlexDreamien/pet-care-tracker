@@ -142,6 +142,19 @@ notification permission — which no amount of web push can promise. The URL is 
 credential for the agenda (titles and dates only, no medical detail); it can be rotated
 from the same screen.
 
+### Push notifications, as a second channel
+
+Settings → _Device notifications_, once `VAPID_PUBLIC_KEY` and `VAPID_PRIVATE_KEY` are
+configured. Leaving them empty disables push and is a supported state, not a broken one.
+
+Two honest caveats. On iOS, push only works after the app has been added to the Home Screen
+— the interface says so rather than showing a permission prompt that silently never appears.
+And the sweep that decides what to send runs inside the server process, so a machine that
+suspends when idle is asleep at the hour reminders are due; `POST /api/v1/push/dispatch`
+exists for a scheduler to wake it, and `.github/workflows/push-reminders.yml` does exactly
+that. A reminder is recorded once per day per item, because a notification repeated is a
+notification learned to ignore.
+
 ## Architecture
 
 A TypeScript monorepo on npm workspaces, arranged as a clean core under a thin layer.
@@ -223,7 +236,7 @@ because a different person is reading it. That is the design, not an inconsisten
 | Lost tag      | a stranger holding the animal | name, photo, a number, the owner's own note | when the tag is turned off or rotated |
 | Sitter link   | someone caring for the animal | allergies, ration, today's doses, the vet   | on a date the owner picked, or sooner |
 
-Planned next: heat and pregnancy cycles, and web push alongside the calendar feed.
+Planned next: heat and pregnancy cycles.
 
 PDFs are produced by the browser's own print dialog rather than by a PDF library: "Save as
 PDF" embeds the system's Cyrillic fonts correctly, which a JavaScript PDF writer would have

@@ -451,6 +451,52 @@ export const careEvents = sqliteTable(
 );
 
 /**
+ * A browser's push subscription.
+ *
+ * One row per browser, not per person: the same owner on a phone and a laptop is two
+ * endpoints, and each dies on its own schedule when the browser decides to rotate it.
+ */
+export const pushSubscriptions = sqliteTable(
+  'push_subscriptions',
+  {
+    id: id(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    endpoint: text('endpoint').notNull(),
+    p256dh: text('p256dh').notNull(),
+    auth: text('auth').notNull(),
+    deviceLabel: text('device_label'),
+    createdAt: createdAt(),
+    lastSentAt: text('last_sent_at'),
+  },
+  (table) => [
+    uniqueIndex('push_subscriptions_endpoint_unique').on(table.endpoint),
+    index('push_subscriptions_user_idx').on(table.userId),
+  ],
+);
+
+/**
+ * What has already been pushed.
+ *
+ * A reminder sent twice is worse than one sent late: the second one teaches the owner to
+ * ignore the first. The agenda item's key is stable across regenerations, which is what
+ * makes this ledger work.
+ */
+export const pushLog = sqliteTable(
+  'push_log',
+  {
+    id: id(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    itemKey: text('item_key').notNull(),
+    sentOn: text('sent_on').notNull(),
+  },
+  (table) => [uniqueIndex('push_log_unique').on(table.userId, table.itemKey, table.sentOn)],
+);
+
+/**
  * A temporary, read-only link for whoever is looking after the animal.
  *
  * The third public surface, and the widest: a sitter is holding the animal, so they get the
@@ -603,4 +649,6 @@ export const schema = {
   sitterLinks,
   sitterLinkPets,
   labValues,
+  pushSubscriptions,
+  pushLog,
 };

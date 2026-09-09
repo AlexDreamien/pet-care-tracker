@@ -392,6 +392,19 @@ const ru = {
     'Добавьте эту ссылку в календарь телефона — напоминания будут приходить, даже если приложение не открывать.',
   'settings.calendarRotate': 'Сменить ссылку',
   'settings.calendarRotateHint': 'Старая перестанет работать, календари придётся подписать заново.',
+  'push.title': 'Уведомления на устройство',
+  'push.body':
+    'Дополнение к подписке на календарь, а не замена: календарь работает, даже если приложение не открывать месяцами и разрешение на уведомления не давать.',
+  'push.enable': 'Включить',
+  'push.disable': 'Выключить',
+  'push.test': 'Проверить',
+  'push.on': 'включены',
+  'push.denied': 'Уведомления запрещены в настройках браузера — снимите запрет там.',
+  'push.unsupported': 'Этот браузер не умеет push-уведомления.',
+  'push.unavailable': 'На этом сервере push не настроен. Напоминания приходят через календарь.',
+  'push.installFirst':
+    'На iPhone уведомления работают только после «На экран „Домой“» — добавьте приложение и вернитесь сюда.',
+
   'settings.passkeys': 'Ключи доступа',
   'settings.passkeyAdd': 'Добавить на этом устройстве',
   'settings.passkeyNever': 'Ни разу не использован',
@@ -788,6 +801,19 @@ const en: Record<MessageKey, string> = {
   'settings.calendarRotate': 'Replace the link',
   'settings.calendarRotateHint':
     'The old one stops working and every calendar has to be subscribed again.',
+  'push.title': 'Device notifications',
+  'push.body':
+    'An addition to the calendar subscription, not a replacement: the calendar keeps working when the app has not been opened for months and no notification permission was ever granted.',
+  'push.enable': 'Turn on',
+  'push.disable': 'Turn off',
+  'push.test': 'Send a test',
+  'push.on': 'on',
+  'push.denied': 'Notifications are blocked in the browser’s settings — unblock them there.',
+  'push.unsupported': 'This browser cannot do push notifications.',
+  'push.unavailable': 'Push is not configured on this instance. Reminders arrive by calendar.',
+  'push.installFirst':
+    'On iPhone, notifications only work once the app is added to the Home Screen — add it and come back.',
+
   'settings.passkeys': 'Passkeys',
   'settings.passkeyAdd': 'Add on this device',
   'settings.passkeyNever': 'Never used',

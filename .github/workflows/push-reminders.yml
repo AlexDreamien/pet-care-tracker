@@ -1,0 +1,35 @@
+name: Push reminders
+
+# Wakes the machine and asks it to send whatever is due.
+#
+# The application has its own quarter-hourly sweep, but it only runs while the process is
+# running, and a Fly machine that suspends when idle is asleep at nine in the morning. This
+# ping is what makes push work on a machine that sleeps. It is also why the calendar feed,
+# which needs no running process at all, remains the primary channel.
+#
+# Scheduled runs on GitHub Actions are best-effort and can be late by tens of minutes, so the
+# sweep is called several times across the morning; the ledger makes a repeat harmless.
+#
+# Requires the repository secrets PUSH_DISPATCH_SECRET and PUBLIC_ORIGIN.
+on:
+  schedule:
+    - cron: '0 5,6,7,8 * * *'
+  workflow_dispatch:
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ask the application to send due reminders
+        run: |
+          response=$(curl -sS --max-time 90 --retry 3 --retry-delay 10 \
+            -o body.json -w '%{http_code}' \
+            -X POST "${PUBLIC_ORIGIN}/api/v1/push/dispatch" \
+            -H "x-dispatch-secret: ${DISPATCH_SECRET}")
+
+          echo "HTTP $response"
+          cat body.json
+          test "$response" = "200"
+        env:
+          PUBLIC_ORIGIN: ${{ secrets.PUBLIC_ORIGIN }}
+          DISPATCH_SECRET: ${{ secrets.PUSH_DISPATCH_SECRET }}

@@ -18,7 +18,7 @@ import { getTableConfig } from 'drizzle-orm/sqlite-core';
 import { schema } from './schema';
 
 /** Stamped into `user_version` once a run completes. Informational, not a gate. */
-export const SCHEMA_VERSION = 4;
+export const SCHEMA_VERSION = 5;
 
 const STATEMENTS = [
   `CREATE TABLE IF NOT EXISTS users (
@@ -299,6 +299,27 @@ const STATEMENTS = [
   )`,
   `CREATE INDEX IF NOT EXISTS care_events_pet_idx ON care_events (pet_id)`,
   `CREATE INDEX IF NOT EXISTS care_events_scheduled_idx ON care_events (scheduled_on)`,
+
+  `CREATE TABLE IF NOT EXISTS push_subscriptions (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    endpoint TEXT NOT NULL,
+    p256dh TEXT NOT NULL,
+    auth TEXT NOT NULL,
+    device_label TEXT,
+    created_at TEXT NOT NULL,
+    last_sent_at TEXT
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS push_subscriptions_endpoint_unique ON push_subscriptions (endpoint)`,
+  `CREATE INDEX IF NOT EXISTS push_subscriptions_user_idx ON push_subscriptions (user_id)`,
+
+  `CREATE TABLE IF NOT EXISTS push_log (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    item_key TEXT NOT NULL,
+    sent_on TEXT NOT NULL
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS push_log_unique ON push_log (user_id, item_key, sent_on)`,
 
   `CREATE TABLE IF NOT EXISTS sitter_links (
     id TEXT PRIMARY KEY,

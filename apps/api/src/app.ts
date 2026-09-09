@@ -24,6 +24,7 @@ import { registerMeasurementRoutes } from './routes/measurements';
 import { registerLabRoutes } from './routes/lab';
 import { registerMedicalRoutes } from './routes/medical';
 import { registerPetRoutes } from './routes/pets';
+import { registerPushRoutes } from './routes/push';
 import { registerSitterRoutes } from './routes/sitter';
 
 export interface BuildAppOptions {
@@ -125,6 +126,7 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
       registerFileRoutes(api, context);
       registerLostTagRoutes(api, context);
       registerSitterRoutes(api, context);
+      registerPushRoutes(api, context);
       registerDocumentRoutes(api, context);
       registerMedicalRoutes(api, context);
       registerLabRoutes(api, context);

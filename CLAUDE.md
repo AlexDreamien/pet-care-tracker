@@ -108,6 +108,11 @@ which plain `node` cannot resolve. Use the scripts, not `node src/…`.
   differ between laboratories, species and machines. `lab_values` stores the range per
   reading for that reason, and a value with no range gets no verdict rather than a guessed
   one.
+- **Push is the second reminder channel and must stay optional.** No VAPID keys means no
+  push and no error. The sweep only runs while the process is awake, which a suspending
+  machine is not, so `POST /push/dispatch` exists for an external scheduler. A reminder is
+  written to `push_log` once per user per item per day: sending twice teaches the owner to
+  ignore the first one.
 - **The app does not give medical advice.** No symptom checking, no diagnosis, no dosage
   recommendation. Built-in schedules are reminder defaults the owner can edit.
 

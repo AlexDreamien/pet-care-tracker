@@ -5,9 +5,18 @@ import { loadConfig } from './config';
 import { createDatabase } from './db/client';
 import { purgeExpiredSessions } from './domain/auth';
 import { purgeExpiredFlows } from './domain/passkeys';
+import { dispatchDueReminders } from './domain/push';
 
 /** Hourly is often enough for rows whose only cost is sitting there. */
 const HOUSEKEEPING_INTERVAL_MS = 60 * 60 * 1000;
+
+/**
+ * How often to look for reminders to push.
+ *
+ * Quarter-hourly rather than hourly so a machine that woke up late still catches the
+ * household's reminder hour. Sending twice is prevented by the ledger, not by the clock.
+ */
+const PUSH_INTERVAL_MS = 15 * 60 * 1000;
 
 async function main(): Promise<void> {
   const config = loadConfig();
@@ -33,9 +42,24 @@ async function main(): Promise<void> {
   }, HOUSEKEEPING_INTERVAL_MS);
   housekeeping.unref();
 
+  /**
+   * The push sweep, while the process happens to be running.
+   *
+   * A machine that suspends when idle will miss this, which is why `POST /push/dispatch`
+   * exists for something outside to call — and why the calendar feed, which needs no
+   * running process at all, is still the primary channel.
+   */
+  const pushSweep = setInterval(() => {
+    void dispatchDueReminders(database, config, new Date()).then((result) => {
+      if (result.notificationsSent > 0) app.log.info(result, 'pushed reminders');
+    });
+  }, PUSH_INTERVAL_MS);
+  pushSweep.unref();
+
   const shutdown = async (signal: string): Promise<void> => {
     app.log.info({ signal }, 'shutting down');
     clearInterval(housekeeping);
+    clearInterval(pushSweep);
     await app.close();
     database.close();
     process.exit(0);

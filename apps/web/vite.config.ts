@@ -8,6 +8,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
+      // The worker is written out rather than generated: it has to handle push, which
+      // generateSW cannot express.
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'],
       manifest: {
@@ -33,34 +38,8 @@ export default defineConfig({
           },
         ],
       },
-      workbox: {
+      injectManifest: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
-        navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/api\//],
-        runtimeCaching: [
-          {
-            // Reads fall back to the last copy so the pet card opens in a clinic with no
-            // signal. The banner in the interface says how old that copy is.
-            urlPattern: ({ url, request }) =>
-              url.pathname.startsWith('/api/') && request.method === 'GET',
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-reads',
-              networkTimeoutSeconds: 4,
-              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
-              cacheableResponse: { statuses: [200] },
-            },
-          },
-          {
-            urlPattern: ({ url }) => url.pathname.startsWith('/api/v1/files/'),
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'files',
-              expiration: { maxEntries: 300, maxAgeSeconds: 60 * 60 * 24 * 90 },
-              cacheableResponse: { statuses: [200] },
-            },
-          },
-        ],
       },
       devOptions: { enabled: false },
     }),

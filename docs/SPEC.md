@@ -58,13 +58,14 @@ route tests, UI, and a README section. Block N is finished before block N+1 star
 Food tracking with bag-depletion forecasting; expense summaries merged from expense rows,
 vet fees and food prices; the QR lost-pet tag with its public page; the printable emergency
 card; the temporary sitter link; laboratory results charted against the range printed on
-the form. PDFs come from the browser's print dialog rather than a PDF library — "Save as PDF"
+the form; web push as a second reminder channel. PDFs come from the browser's print dialog
+rather than a PDF library — "Save as PDF"
 embeds the system's Cyrillic fonts correctly, which a JavaScript PDF writer would have to
 be taught to do and would get subtly wrong.
 
 ### Later — still ahead
 
-Heat and pregnancy cycles; web push alongside the calendar feed.
+Heat and pregnancy cycles.
 
 ### Out of scope — not planned
 
