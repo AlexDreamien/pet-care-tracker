@@ -37,7 +37,9 @@ primary_region = "fra"   # Frankfurt, the closest large EU region
   [[http_service.checks]]
     interval = "30s"
     timeout = "5s"
-    grace_period = "10s"
+    # The API is a compiled bundle started with plain `node`, so a cold container is
+    # answering in a couple of seconds. The margin is for a shared vCPU on a bad day.
+    grace_period = "30s"
     method = "GET"
     path = "/api/v1/health"
 

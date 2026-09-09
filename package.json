@@ -23,12 +23,16 @@
     "api:dev": "npm run dev -w @pet-care-tracker/api",
     "migrate": "npm run migrate -w @pet-care-tracker/api",
     "web": "npm run dev -w @pet-care-tracker/web",
-    "build": "npm run build -w @pet-care-tracker/web",
+    "build": "npm run build:api && npm run build:web",
+    "build:api": "node tools/bundle.mjs",
+    "build:web": "npm run build -w @pet-care-tracker/web",
+    "start": "node --enable-source-maps apps/api/build/server.js",
     "local": "node tools/local.mjs",
     "capture": "node tools/capture.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.20.1",
+    "esbuild": "^0.28.2",
     "prettier": "^3.9.6",
     "tsx": "^4.23.12",
     "typescript": "^5.6.0",

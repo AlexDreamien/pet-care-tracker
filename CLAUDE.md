@@ -16,19 +16,24 @@ npm run typecheck         # tsc --build across the workspace
 npm run format:check      # prettier
 npm run api:dev           # Fastify with reload
 npm run web               # Vite dev server, proxying /api to the backend
-npm run build             # production bundle of apps/web
+npm run build             # both: the API bundle and the front end
+npm run start             # the compiled API, exactly as the container starts it
 npm run local             # one process, one origin — the shape production runs in
 npm run capture           # seed a demo household and photograph every screen
 ```
 
 `npm run local` is worth using before a deploy: development runs two servers behind a
 proxy, which is convenient but not what ships, and the single-origin path has broken on its
-own before. `npm run capture` needs `npm run local` already running.
+own before. It runs the compiled bundle, so `npm run build` has to come first, and
+`npm run capture` — which needs `npm run local` already running — is therefore a smoke test
+of the artifact that gets deployed.
 
 Run one test: `npx vitest run -t "<name>"`.
 
-TypeScript runs unbundled through `tsx`: imports inside the workspace are extensionless,
-which plain `node` cannot resolve. Use the scripts, not `node src/…`.
+In development TypeScript runs unbundled through `tsx` (`npm run api:dev`, `npm run api`):
+imports inside the workspace are extensionless, which plain `node` cannot resolve. Use the
+scripts, not `node src/…`. In production there is no `tsx` — `tools/bundle.mjs` compiles the
+API to `apps/api/build/server.js` and the container starts that with plain `node`.
 
 ## Architecture invariant
 
@@ -107,6 +112,12 @@ which plain `node` cannot resolve. Use the scripts, not `node src/…`.
 - **Storage is raw, presentation converts.** Weights are stored in kilograms and lengths in
   centimetres; kg/lb and cm/in are a display concern in `packages/core` formatters. Storing
   a converted value breaks every past reading.
+- **Nothing compiles at boot in production.** The server used to start with
+  `npx tsx src/index.ts`, which meant `npm exec` plus type-stripping the whole API on a
+  shared vCPU: about four minutes of 502 after every deploy, with no log output, looking
+  exactly like a crash. The API is bundled at build time and started with plain `node`. If
+  you add a dependency it stays external — only `@pet-care-tracker/*` is bundled — and if
+  you make the runtime resolve source files again, this comes back.
 - **Deploy by pushing to `main`.** A manual `flyctl deploy` races the CI deployment — the
   sibling bot in this workspace lost its machine to exactly that.
 - **Reference ranges come from the laboratory's form, never from the application.** They
