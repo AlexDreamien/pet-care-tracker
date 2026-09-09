@@ -183,3 +183,16 @@ export function documentUrgency(
 export function initials(name: string): string {
   return [...name.trim()].slice(0, 1).join('').toUpperCase() || '?';
 }
+
+/**
+ * The options for a picker, guaranteeing the stored value is among them.
+ *
+ * `Intl.supportedValuesOf('timeZone')` omits `UTC`, which is the default every household
+ * starts on — so a select bound to it matched nothing and silently displayed the first
+ * entry, Africa/Abidjan. Saving the form without touching the field would then have moved
+ * the household to Côte d'Ivoire. A picker must never show a value other than the one it
+ * holds.
+ */
+export function optionsIncluding(available: readonly string[], current: string): string[] {
+  return available.includes(current) ? [...available] : [current, ...available];
+}

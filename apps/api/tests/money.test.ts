@@ -182,6 +182,46 @@ describe('expenses', () => {
     expect(one.json().summary.total).toBe(500);
   });
 
+  it('totals in the household currency once it is changed', async () => {
+    await asUser(test, cookie, {
+      method: 'PATCH',
+      url: `/api/v1/households/${householdId}`,
+      payload: { currency: 'eur' },
+    });
+
+    // An expense entered without naming a currency takes the household's.
+    await post('/expenses', { category: 'food', amount: 40, spentOn: '2026-05-01' });
+
+    const response = await get('/expenses?from=2026-01-01&to=2026-12-31');
+    expect(response.json().summary.currency).toBe('EUR');
+    expect(response.json().summary.total).toBe(40);
+    expect(response.json().summary.excluded).toEqual([]);
+  });
+
+  it('sets aside what was entered before the currency changed', async () => {
+    await post('/expenses', { category: 'food', amount: 1000, spentOn: '2026-05-01' });
+    await asUser(test, cookie, {
+      method: 'PATCH',
+      url: `/api/v1/households/${householdId}`,
+      payload: { currency: 'EUR' },
+    });
+
+    const response = await get('/expenses?from=2026-01-01&to=2026-12-31');
+    // Nothing is silently reinterpreted: the old roubles are still roubles.
+    expect(response.json().summary.total).toBe(0);
+    expect(response.json().summary.excluded).toHaveLength(1);
+    expect(response.json().summary.excluded[0].currency).toBe('RUB');
+  });
+
+  it('refuses something that is not a currency code', async () => {
+    const response = await asUser(test, cookie, {
+      method: 'PATCH',
+      url: `/api/v1/households/${householdId}`,
+      payload: { currency: 'roubles' },
+    });
+    expect(response.statusCode).toBe(422);
+  });
+
   it('keeps another household out of the total', async () => {
     const stranger = await signUp(test, { email: 'stranger@example.com' });
     await asUser(test, stranger.cookie, {

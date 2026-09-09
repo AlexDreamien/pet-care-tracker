@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { Age } from '@pet-care-tracker/core';
 import {
   documentUrgency,
+  optionsIncluding,
   formatAge,
   formatMeasurement,
   formatRelativeDays,
@@ -163,6 +164,31 @@ describe('staleness and expiry', () => {
     expect(documentUrgency('2026-10-01', '2026-09-08')).toBe('expiring');
     expect(documentUrgency('2027-10-01', '2026-09-08')).toBe('fine');
     expect(documentUrgency(null, '2026-09-08')).toBeNull();
+  });
+});
+
+describe('optionsIncluding', () => {
+  it('leaves a list alone when it already holds the value', () => {
+    expect(optionsIncluding(['Europe/Berlin', 'Europe/Moscow'], 'Europe/Moscow')).toEqual([
+      'Europe/Berlin',
+      'Europe/Moscow',
+    ]);
+  });
+
+  it('adds a value the list is missing, first', () => {
+    // Intl omits UTC from its zone list, and a select bound to UTC silently displayed
+    // Africa/Abidjan — the first entry — so saving the form moved the household there.
+    expect(optionsIncluding(['Africa/Abidjan', 'Europe/Berlin'], 'UTC')).toEqual([
+      'UTC',
+      'Africa/Abidjan',
+      'Europe/Berlin',
+    ]);
+  });
+
+  it('does not mutate what it was given', () => {
+    const available = ['Europe/Berlin'];
+    optionsIncluding(available, 'UTC');
+    expect(available).toEqual(['Europe/Berlin']);
   });
 });
 

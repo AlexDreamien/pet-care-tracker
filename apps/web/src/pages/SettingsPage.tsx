@@ -1,10 +1,10 @@
 import { startRegistration } from '@simplewebauthn/browser';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useMemo, useState } from 'react';
 import { api } from '../api/client';
 import type { Passkey } from '../api/types';
 import { useAction, useResource } from '../app/hooks';
 import { useSession, useUser } from '../app/session';
-import { formatDate } from '../lib/format';
+import { formatDate, optionsIncluding } from '../lib/format';
 import { LOCALES, type MessageKey } from '../lib/i18n';
 import { NotificationsSection } from './NotificationsSection';
 import { SitterLinksSection } from './SitterLinksSection';
@@ -16,6 +16,9 @@ interface HouseholdDetail {
     name: string;
     reminderLeadDays: number;
     reminderHour: number;
+    timeZone: string;
+    currency: string;
+    foodLeadDays: number;
     calendarUrl: string;
   };
   role: string;
@@ -37,6 +40,7 @@ export function SettingsPage(): ReactNode {
 
       {detail.data && (
         <>
+          <HouseholdCard detail={detail.data} onSaved={detail.reload} />
           <RemindersCard detail={detail.data} onSaved={detail.reload} />
           <CalendarCard detail={detail.data} onRotated={detail.reload} />
           <MembersCard detail={detail.data} onChanged={detail.reload} />
@@ -95,8 +99,9 @@ function ProfileCard({ onSaved }: { onSaved: () => Promise<void> }): ReactNode {
     await onSaved();
   });
 
-  // The zones the browser knows, so nothing unresolvable can be chosen.
-  const zones = Intl.supportedValuesOf('timeZone');
+  // The zones the browser knows, plus whatever is stored: the list omits UTC, and a select
+  // that cannot show its own value is a select that changes it.
+  const zones = optionsIncluding(Intl.supportedValuesOf('timeZone'), user.timeZone);
 
   return (
     <section>
@@ -140,6 +145,89 @@ function ProfileCard({ onSaved }: { onSaved: () => Promise<void> }): ReactNode {
   );
 }
 
+/**
+ * What belongs to the household rather than to the person reading the screen.
+ *
+ * The time zone here is not the same setting as the one on the profile above, and the
+ * difference matters: the profile's decides what "today" means on this screen, while this
+ * one is what the calendar feed and the sitter notes are read in — neither of which has
+ * anybody signed in to ask.
+ */
+function HouseholdCard({
+  detail,
+  onSaved,
+}: {
+  detail: HouseholdDetail;
+  onSaved: () => void;
+}): ReactNode {
+  const { t, locale } = useSession();
+  const [name, setName] = useState(detail.household.name);
+  const [currency, setCurrency] = useState(detail.household.currency);
+  const [timeZone, setTimeZone] = useState(detail.household.timeZone);
+
+  const save = useAction(async () => {
+    await api.patch(`/households/${detail.household.id}`, { name, currency, timeZone });
+    onSaved();
+  });
+
+  // Every code the browser knows, named in the reader's language, rather than a short list
+  // that would be wrong for whoever lives somewhere I did not think of.
+  const currencies = useMemo(() => {
+    const names = new Intl.DisplayNames([locale === 'ru' ? 'ru' : 'en'], { type: 'currency' });
+    return optionsIncluding(Intl.supportedValuesOf('currency'), detail.household.currency)
+      .map((code) => ({ code, label: `${code} — ${names.of(code) ?? code}` }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+  }, [locale, detail.household.currency]);
+
+  const zones = useMemo(
+    () => optionsIncluding(Intl.supportedValuesOf('timeZone'), detail.household.timeZone),
+    [detail.household.timeZone],
+  );
+
+  return (
+    <section>
+      <SectionTitle>{t('settings.household')}</SectionTitle>
+      <Card className="space-y-3">
+        <Field label={t('settings.householdName')}>
+          <Input value={name} onChange={(e) => setName(e.target.value)} />
+        </Field>
+
+        <Field
+          label={t('settings.currency')}
+          hint={t('settings.currencyHint')}
+          error={save.error?.fieldError('currency')}
+        >
+          <Select value={currency} onChange={(e) => setCurrency(e.target.value)}>
+            {currencies.map((entry) => (
+              <option key={entry.code} value={entry.code}>
+                {entry.label}
+              </option>
+            ))}
+          </Select>
+        </Field>
+
+        <Field
+          label={t('settings.householdTimeZone')}
+          hint={t('settings.householdTimeZoneHint')}
+          error={save.error?.fieldError('timeZone')}
+        >
+          <Select value={timeZone} onChange={(e) => setTimeZone(e.target.value)}>
+            {zones.map((zone) => (
+              <option key={zone} value={zone}>
+                {zone}
+              </option>
+            ))}
+          </Select>
+        </Field>
+
+        <Button disabled={save.pending} onClick={() => void save.run()}>
+          {t('action.save')}
+        </Button>
+      </Card>
+    </section>
+  );
+}
+
 function RemindersCard({
   detail,
   onSaved,
@@ -150,9 +238,10 @@ function RemindersCard({
   const { t } = useSession();
   const [leadDays, setLeadDays] = useState(detail.household.reminderLeadDays);
   const [hour, setHour] = useState(detail.household.reminderHour);
+  const [foodLeadDays, setFoodLeadDays] = useState(detail.household.foodLeadDays);
 
   const save = useAction(async () => {
-    await api.patch(`/households/${detail.household.id}`, { leadDays, hour });
+    await api.patch(`/households/${detail.household.id}`, { leadDays, hour, foodLeadDays });
     onSaved();
   });
 
@@ -180,6 +269,16 @@ function RemindersCard({
             />
           </Field>
         </div>
+
+        <Field label={t('settings.foodLeadDays')}>
+          <Input
+            type="number"
+            min={0}
+            max={60}
+            value={foodLeadDays}
+            onChange={(e) => setFoodLeadDays(Number(e.target.value))}
+          />
+        </Field>
 
         <Button disabled={save.pending} onClick={() => void save.run()}>
           {t('action.save')}

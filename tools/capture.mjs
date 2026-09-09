@@ -7,13 +7,20 @@
  *
  * Usage: start the server with WEB_DIST pointing at a built apps/web, then
  *   node tools/capture.mjs [http://127.0.0.1:5199] [docs/screenshots]
+ *
+ * COLOR_SCHEME=dark photographs the dark palette into docs/screenshots/dark instead.
  */
 
 import { mkdir } from 'node:fs/promises';
 import { chromium } from 'playwright';
 
 const BASE = process.argv[2] ?? 'http://127.0.0.1:5199';
-const OUT = process.argv[3] ?? 'docs/screenshots';
+const SCHEME = process.env.COLOR_SCHEME === 'dark' ? 'dark' : 'light';
+
+// The default output follows the scheme. When it did not, a dark run with no path argument
+// quietly wrote dark images over the light set, and the difference is only visible by
+// opening them.
+const OUT = process.argv[3] ?? (SCHEME === 'dark' ? 'docs/screenshots/dark' : 'docs/screenshots');
 
 const account = {
   email: `demo+${Date.now()}@example.com`,
@@ -291,14 +298,12 @@ async function main() {
   const { rex, tag, sitter } = await seed();
   await mkdir(OUT, { recursive: true });
 
-  const scheme = process.env.COLOR_SCHEME === 'dark' ? 'dark' : 'light';
-
   const browser = await chromium.launch();
   const context = await browser.newContext({
     viewport: { width: 414, height: 896 },
     deviceScaleFactor: 2,
     locale: 'ru-RU',
-    colorScheme: scheme,
+    colorScheme: SCHEME,
     // A phone is where this application is actually used.
     isMobile: true,
     hasTouch: true,
@@ -339,7 +344,7 @@ async function main() {
     viewport: { width: 414, height: 896 },
     deviceScaleFactor: 2,
     locale: 'ru-RU',
-    colorScheme: scheme,
+    colorScheme: SCHEME,
     isMobile: true,
     hasTouch: true,
   });

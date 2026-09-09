@@ -379,6 +379,13 @@ const ru = {
   'settings.timeZone': 'Часовой пояс',
   'settings.language': 'Язык',
   'settings.household': 'Домохозяйство',
+  'settings.householdName': 'Название',
+  'settings.currency': 'Валюта',
+  'settings.currencyHint':
+    'В ней считается сводка расходов. Записи в другой валюте не пересчитываются, а выносятся отдельно.',
+  'settings.householdTimeZone': 'Часовой пояс домохозяйства',
+  'settings.householdTimeZoneHint':
+    'В нём записано время приёмов: по нему календарная подписка и памятка для передержки понимают, когда наступает завтра.',
   'settings.members': 'Кто имеет доступ',
   'settings.addMember': 'Добавить по почте',
   'settings.role.owner': 'Владелец',
@@ -787,6 +794,13 @@ const en: Record<MessageKey, string> = {
   'settings.timeZone': 'Time zone',
   'settings.language': 'Language',
   'settings.household': 'Household',
+  'settings.householdName': 'Name',
+  'settings.currency': 'Currency',
+  'settings.currencyHint':
+    'The expense summary totals in it. Anything recorded in another currency is set aside rather than converted.',
+  'settings.householdTimeZone': 'Household time zone',
+  'settings.householdTimeZoneHint':
+    'Appointment times are written in it, and the calendar feed and the sitter notes use it to decide when tomorrow starts.',
   'settings.members': 'Who has access',
   'settings.addMember': 'Add by email',
   'settings.role.owner': 'Owner',

@@ -99,6 +99,11 @@ which plain `node` cannot resolve. Use the scripts, not `node src/…`.
 - **Printing is the browser's job.** The print routes render a sheet and call `window.print`;
   `?preview` suppresses the dialog. A PDF library would have to be taught to embed Cyrillic
   fonts and would get it subtly wrong.
+- **A `<select>` must contain the value it is bound to.** `Intl.supportedValuesOf('timeZone')`
+  omits `UTC`, which is what every household starts on, so the control displayed its first
+  entry — Africa/Abidjan — and saving the form without touching the field would have moved
+  the household there. `optionsIncluding` in `apps/web/src/lib/format.ts` is the guard;
+  use it for anything filled from an `Intl` list.
 - **Storage is raw, presentation converts.** Weights are stored in kilograms and lengths in
   centimetres; kg/lb and cm/in are a display concern in `packages/core` formatters. Storing
   a converted value breaks every past reading.
