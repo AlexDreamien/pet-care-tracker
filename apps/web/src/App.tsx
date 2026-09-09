@@ -5,6 +5,7 @@ import { useSession } from './app/session';
 import { AgendaPage } from './pages/AgendaPage';
 import { ContactsPage } from './pages/ContactsPage';
 import { FoundPage } from './pages/FoundPage';
+import { SitterPage } from './pages/SitterPage';
 import { CardPrintPage, TagPrintPage } from './pages/pet/PrintPages';
 import { ExpensesPage } from './pages/ExpensesPage';
 import { PetPage } from './pages/PetPage';
@@ -40,6 +41,8 @@ export function App(): ReactNode {
     <Routes>
       {/* Public, and outside the sign-in gate: whoever found the animal has no account. */}
       <Route path="/found/:token" element={<FoundPage />} />
+      {/* Also public: whoever is looking after the animal has no account either. */}
+      <Route path="/sitter/:token" element={<SitterPage />} />
       <Route path="*" element={<SignedInApp />} />
     </Routes>
   );

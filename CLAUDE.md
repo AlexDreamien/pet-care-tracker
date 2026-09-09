@@ -85,6 +85,10 @@ which plain `node` cannot resolve. Use the scripts, not `node src/…`.
   which is why `tests/spa.test.ts` exists.
 - **Uploaded images are stripped of EXIF, GPS included, before storage.** A pet photo
   taken at home carries the owner's address.
+- **Three public surfaces, three disclosure levels, all deliberate.** Calendar feed: titles
+  and dates. Lost tag: what the owner typed, no medical record, no microchip. Sitter link:
+  allergies, ration and doses, because somebody is holding the animal — read-only, scoped to
+  chosen pets, and expiring. Widening any of them is a decision, not a convenience.
 - **The lost tag and the emergency card disclose different things on purpose.** The tag is
   public and shows only what the owner typed; nothing is read from the medical record and
   the microchip is omitted. The card is handed over in person and carries all of it. Do not

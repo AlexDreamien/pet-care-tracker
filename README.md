@@ -14,6 +14,9 @@ readable when there is no signal.
   <img src="docs/screenshots/found.png" alt="What a stranger sees after scanning the lost-pet tag" width="260">
   <img src="docs/screenshots/emergency-card.png" alt="The printable emergency card for a consulting room" width="260">
 </p>
+<p align="center">
+  <img src="docs/screenshots/sitter.png" alt="The read-only care notes a sitter opens" width="260">
+</p>
 
 ## Why
 
@@ -52,6 +55,12 @@ anyway). The token is replaceable, for when the tag comes off in a park.
 **Emergency card.** The opposite disclosure choice: one printable page for a consulting
 room, handed over in person, carrying the chip, the allergies, what the animal is currently
 taking and when it was last vaccinated.
+
+**Sitter link.** A temporary, read-only page for whoever is looking after the animal,
+answering the questions somebody standing in a kitchen actually has: what must it never be
+offered, what does it eat, what do I give today, what is coming, who do I ring. It names
+only the pets that were handed over, stops working the day after a date the owner chose, and
+can be revoked before then.
 
 **Sharing.** A household, not an account, owns the pets — so adding a partner is adding a
 member, with an editor or read-only role.
@@ -196,8 +205,18 @@ integrations with specific clinic systems. Offline writes are also out of scope 
 fall back to a cached copy, but a change that cannot reach the server fails loudly rather
 than sitting in a queue an owner cannot see.
 
-Planned next: a temporary link for a sitter, lab-result trends, and web push alongside the
-calendar feed.
+### Three public surfaces, three different answers
+
+Each is reached by an opaque token and needs no account, and each shows a different amount
+because a different person is reading it. That is the design, not an inconsistency.
+
+| Surface       | Reader                        | Shows                                       | Ends                                  |
+| ------------- | ----------------------------- | ------------------------------------------- | ------------------------------------- |
+| Calendar feed | a calendar client             | titles and dates                            | when the token is rotated             |
+| Lost tag      | a stranger holding the animal | name, photo, a number, the owner's own note | when the tag is turned off or rotated |
+| Sitter link   | someone caring for the animal | allergies, ration, today's doses, the vet   | on a date the owner picked, or sooner |
+
+Planned next: lab-result trends, and web push alongside the calendar feed.
 
 PDFs are produced by the browser's own print dialog rather than by a PDF library: "Save as
 PDF" embeds the system's Cyrillic fonts correctly, which a JavaScript PDF writer would have

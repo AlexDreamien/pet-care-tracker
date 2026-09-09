@@ -422,6 +422,49 @@ export const careEvents = sqliteTable(
   ],
 );
 
+/**
+ * A temporary, read-only link for whoever is looking after the animal.
+ *
+ * The third public surface, and the widest: a sitter is holding the animal, so they get the
+ * allergies, the ration and what to give when. It expires on a date the owner picks and can
+ * be revoked before then — the two things that make handing it over reasonable.
+ */
+export const sitterLinks = sqliteTable(
+  'sitter_links',
+  {
+    id: id(),
+    householdId: text('household_id')
+      .notNull()
+      .references(() => households.id, { onDelete: 'cascade' }),
+    token: text('token').notNull(),
+    /** Who it was made for, so a list of links is not a list of opaque strings. */
+    label: text('label').notNull(),
+    /** Inclusive last day it works. */
+    expiresOn: text('expires_on').notNull(),
+    revokedAt: text('revoked_at'),
+    createdAt: createdAt(),
+  },
+  (table) => [
+    uniqueIndex('sitter_links_token_unique').on(table.token),
+    index('sitter_links_household_idx').on(table.householdId),
+  ],
+);
+
+/** Which animals a link covers: the dog at the sitter, not the cat still at home. */
+export const sitterLinkPets = sqliteTable(
+  'sitter_link_pets',
+  {
+    id: id(),
+    linkId: text('link_id')
+      .notNull()
+      .references(() => sitterLinks.id, { onDelete: 'cascade' }),
+    petId: text('pet_id')
+      .notNull()
+      .references(() => pets.id, { onDelete: 'cascade' }),
+  },
+  (table) => [uniqueIndex('sitter_link_pets_unique').on(table.linkId, table.petId)],
+);
+
 // -- food and money -------------------------------------------------------------------------------
 
 export const foodBags = sqliteTable(
@@ -529,4 +572,6 @@ export const schema = {
   eventCompletions,
   foodBags,
   expenses,
+  sitterLinks,
+  sitterLinkPets,
 };

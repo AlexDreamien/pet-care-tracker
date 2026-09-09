@@ -18,7 +18,7 @@ import { getTableConfig } from 'drizzle-orm/sqlite-core';
 import { schema } from './schema';
 
 /** Stamped into `user_version` once a run completes. Informational, not a gate. */
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 const STATEMENTS = [
   `CREATE TABLE IF NOT EXISTS users (
@@ -284,6 +284,25 @@ const STATEMENTS = [
   )`,
   `CREATE INDEX IF NOT EXISTS care_events_pet_idx ON care_events (pet_id)`,
   `CREATE INDEX IF NOT EXISTS care_events_scheduled_idx ON care_events (scheduled_on)`,
+
+  `CREATE TABLE IF NOT EXISTS sitter_links (
+    id TEXT PRIMARY KEY,
+    household_id TEXT NOT NULL REFERENCES households(id) ON DELETE CASCADE,
+    token TEXT NOT NULL,
+    label TEXT NOT NULL,
+    expires_on TEXT NOT NULL,
+    revoked_at TEXT,
+    created_at TEXT NOT NULL
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS sitter_links_token_unique ON sitter_links (token)`,
+  `CREATE INDEX IF NOT EXISTS sitter_links_household_idx ON sitter_links (household_id)`,
+
+  `CREATE TABLE IF NOT EXISTS sitter_link_pets (
+    id TEXT PRIMARY KEY,
+    link_id TEXT NOT NULL REFERENCES sitter_links(id) ON DELETE CASCADE,
+    pet_id TEXT NOT NULL REFERENCES pets(id) ON DELETE CASCADE
+  )`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS sitter_link_pets_unique ON sitter_link_pets (link_id, pet_id)`,
 
   `CREATE TABLE IF NOT EXISTS food_bags (
     id TEXT PRIMARY KEY,

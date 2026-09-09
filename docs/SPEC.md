@@ -57,14 +57,14 @@ route tests, UI, and a README section. Block N is finished before block N+1 star
 
 Food tracking with bag-depletion forecasting; expense summaries merged from expense rows,
 vet fees and food prices; the QR lost-pet tag with its public page; the printable emergency
-card. PDFs come from the browser's print dialog rather than a PDF library — "Save as PDF"
+card; the temporary sitter link. PDFs come from the browser's print dialog rather than a
+PDF library — "Save as PDF"
 embeds the system's Cyrillic fonts correctly, which a JavaScript PDF writer would have to
 be taught to do and would get subtly wrong.
 
 ### Later — still ahead
 
-Temporary sitter link; lab-result trends; heat and pregnancy cycles; web push alongside the
-calendar feed.
+Lab-result trends; heat and pregnancy cycles; web push alongside the calendar feed.
 
 ### Out of scope — not planned
 
@@ -144,9 +144,9 @@ to draw the corridor on the chart and to flag a reading outside it.
 The current neck girth, chest girth and back length together form the **size card**, the
 one screen an owner opens in a shop when buying a harness or a coat.
 
-### The two public surfaces
+### The three public surfaces
 
-Both are reached by an opaque token and neither needs a session. They exist for different
+Each is reached by an opaque token and none needs a session. They exist for different
 readers and therefore disclose different things — which is the whole design, not an
 oversight.
 
@@ -158,8 +158,13 @@ oversight.
   national registries. The photo is served by tag token, never by file id, so the URL
   cannot be walked into the household's other files.
 
-Both tokens are replaceable, and replacing one invalidates what was printed or subscribed —
-the honest cost of revocation.
+- **Sitter link** (`sitter_links.token`) — the widest, because someone is holding the
+  animal: allergies, the ration, today's doses, upcoming care and the vet. Read-only, scoped
+  to the pets the owner selected, dead the day after an expiry date they chose, and
+  revocable before then. Those four limits are what make handing it over reasonable.
+
+Every token is replaceable, and replacing one invalidates what was printed, sent or
+subscribed — the honest cost of revocation.
 
 ### Calendar and contacts
 

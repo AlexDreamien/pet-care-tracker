@@ -6,6 +6,7 @@ import { useAction, useResource } from '../app/hooks';
 import { useSession, useUser } from '../app/session';
 import { formatDate } from '../lib/format';
 import { LOCALES, type MessageKey } from '../lib/i18n';
+import { SitterLinksSection } from './SitterLinksSection';
 import { Button, Card, Field, Input, Select, SectionTitle } from '../ui/primitives';
 
 interface HouseholdDetail {
@@ -40,6 +41,8 @@ export function SettingsPage(): ReactNode {
           <MembersCard detail={detail.data} onChanged={detail.reload} />
         </>
       )}
+
+      <SitterLinksSection />
 
       <section>
         <SectionTitle>{t('settings.passkeys')}</SectionTitle>

@@ -199,6 +199,18 @@ export const lostTagSchema = z.object({
   note: optionalText(500),
 });
 
+/**
+ * A temporary link for whoever is looking after the animal.
+ *
+ * The expiry date is required rather than optional: a handover link with no end is not a
+ * handover link, it is a second front door.
+ */
+export const sitterLinkSchema = z.object({
+  label: requiredText(80),
+  expiresOn: isoDateSchema,
+  petIds: z.array(z.uuid()).min(1).max(20),
+});
+
 // -- documents and medical record --------------------------------------------------------
 
 export const documentSchema = z
@@ -422,3 +434,4 @@ export type ReminderPreferenceInput = z.infer<typeof reminderPreferenceSchema>;
 export type FoodBagInput = z.infer<typeof foodBagSchema>;
 export type ExpenseInput = z.infer<typeof expenseSchema>;
 export type LostTagInput = z.infer<typeof lostTagSchema>;
+export type SitterLinkInput = z.infer<typeof sitterLinkSchema>;

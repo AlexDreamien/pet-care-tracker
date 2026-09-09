@@ -240,11 +240,16 @@ async function seed() {
     body: { kind: 'groomer', name: 'Салон «Пушистик»', phone: '+7 999 765-43-21' },
   });
 
-  return { rex, musya, tag };
+  const sitter = await call('/sitter-links', {
+    method: 'POST',
+    body: { label: 'Соседка Ира', expiresOn: shift(12), petIds: [rex.id] },
+  });
+
+  return { rex, musya, tag, sitter };
 }
 
 async function main() {
-  const { rex, tag } = await seed();
+  const { rex, tag, sitter } = await seed();
   await mkdir(OUT, { recursive: true });
 
   const scheme = process.env.COLOR_SCHEME === 'dark' ? 'dark' : 'light';
@@ -306,6 +311,14 @@ async function main() {
   await strangerPage.waitForSelector('text=Я потерялся', { timeout: 10_000 });
   await strangerPage.screenshot({ path: `${OUT}/found.png` });
   console.log('found.png');
+
+  await strangerPage.goto(new URL(sitter.url).pathname.replace(/^/, BASE), {
+    waitUntil: 'networkidle',
+  });
+  await strangerPage.waitForSelector('text=Чем кормить', { timeout: 10_000 });
+  await strangerPage.screenshot({ path: `${OUT}/sitter.png`, fullPage: true });
+  console.log('sitter.png');
+
   await anonymous.close();
 
   await browser.close();
