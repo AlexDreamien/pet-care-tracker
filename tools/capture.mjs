@@ -181,6 +181,45 @@ async function seed() {
     });
   }
 
+  for (const [analyte, unit, refMin, refMax, points] of [
+    [
+      'Creatinine',
+      'µmol/L',
+      44,
+      159,
+      [
+        [-400, 88],
+        [-190, 104],
+        [-30, 143],
+      ],
+    ],
+    [
+      'Urea',
+      'mmol/L',
+      2.5,
+      9.6,
+      [
+        [-400, 5.1],
+        [-190, 6.4],
+        [-30, 8.2],
+      ],
+    ],
+  ]) {
+    for (const [days, value] of points) {
+      await call(`/pets/${rex.id}/labs`, {
+        method: 'POST',
+        body: {
+          analyte,
+          value,
+          unit,
+          measuredOn: shift(days),
+          referenceMin: refMin,
+          referenceMax: refMax,
+        },
+      });
+    }
+  }
+
   await call(`/pets/${rex.id}/documents`, {
     method: 'POST',
     body: { kind: 'vet_passport', title: 'Ветпаспорт', expiresOn: shift(38) },
@@ -291,6 +330,7 @@ async function main() {
   await shoot(`/pets/${rex.id}/food`, 'food', 'text=Открытая пачка');
   await shoot('/expenses', 'expenses', 'text=Всего');
   await shoot('/settings', 'settings', 'text=Подписка на календарь');
+  await shoot(`/pets/${rex.id}/labs`, 'labs', 'text=Creatinine');
   await shoot(`/pets/${rex.id}/print/card?preview`, 'emergency-card', 'text=Аллергия');
   await shoot(`/pets/${rex.id}/print/tag?preview`, 'lost-tag', 'svg');
 

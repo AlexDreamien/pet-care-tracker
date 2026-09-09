@@ -11,6 +11,7 @@ export * from './parasite';
 export * from './medication';
 export * from './food';
 export * from './expenses';
+export * from './lab';
 export * from './ics';
 export * from './agenda';
 export * from './schemas';

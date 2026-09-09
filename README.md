@@ -38,6 +38,13 @@ computed from the animal's age and history. Visits. Allergies and chronic condit
 flagged on the pet's header where a vet can see them without asking. Medication courses
 expanded into individual doses to tick off.
 
+**Laboratory results.** Values off a form charted over time against the range that
+laboratory printed beside them. The application supplies no reference range of its own —
+ranges differ between laboratories, species and machines, and inventing one would be exactly
+the medical content this project stays out of. A series recorded in two different units is
+flagged rather than drawn, because charting mmol/L against mg/dL as one line draws a cliff
+that is not in the animal.
+
 **Measurements.** Weight, body condition score and girths charted over time against a
 target range, with a **size card** — the current neck, chest and back measurements, each
 labelled with how old it is, for the moment you are standing in a shop holding a harness.
@@ -216,7 +223,7 @@ because a different person is reading it. That is the design, not an inconsisten
 | Lost tag      | a stranger holding the animal | name, photo, a number, the owner's own note | when the tag is turned off or rotated |
 | Sitter link   | someone caring for the animal | allergies, ration, today's doses, the vet   | on a date the owner picked, or sooner |
 
-Planned next: lab-result trends, and web push alongside the calendar feed.
+Planned next: heat and pregnancy cycles, and web push alongside the calendar feed.
 
 PDFs are produced by the browser's own print dialog rather than by a PDF library: "Save as
 PDF" embeds the system's Cyrillic fonts correctly, which a JavaScript PDF writer would have

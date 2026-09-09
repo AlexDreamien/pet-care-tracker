@@ -357,6 +357,34 @@ export const medicationDoses = sqliteTable(
   ],
 );
 
+/**
+ * One number off a laboratory form.
+ *
+ * The reference range is stored per reading, not per analyte: ranges differ between
+ * laboratories and machines, and the one that matters is the one printed on the form the
+ * value came from.
+ */
+export const labValues = sqliteTable(
+  'lab_values',
+  {
+    id: id(),
+    petId: text('pet_id')
+      .notNull()
+      .references(() => pets.id, { onDelete: 'cascade' }),
+    /** The scan the numbers were read off, when there is one. */
+    documentId: text('document_id').references(() => documents.id, { onDelete: 'set null' }),
+    analyte: text('analyte').notNull(),
+    value: real('value').notNull(),
+    unit: text('unit').notNull(),
+    measuredOn: text('measured_on').notNull(),
+    referenceMin: real('reference_min'),
+    referenceMax: real('reference_max'),
+    notes: text('notes'),
+    createdAt: createdAt(),
+  },
+  (table) => [index('lab_values_pet_idx').on(table.petId, table.analyte, table.measuredOn)],
+);
+
 // -- measurements ------------------------------------------------------------------------------
 
 export const measurements = sqliteTable(
@@ -574,4 +602,5 @@ export const schema = {
   expenses,
   sitterLinks,
   sitterLinkPets,
+  labValues,
 };

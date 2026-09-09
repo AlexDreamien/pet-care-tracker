@@ -18,7 +18,7 @@ import { getTableConfig } from 'drizzle-orm/sqlite-core';
 import { schema } from './schema';
 
 /** Stamped into `user_version` once a run completes. Informational, not a gate. */
-export const SCHEMA_VERSION = 3;
+export const SCHEMA_VERSION = 4;
 
 const STATEMENTS = [
   `CREATE TABLE IF NOT EXISTS users (
@@ -243,6 +243,21 @@ const STATEMENTS = [
   )`,
   `CREATE UNIQUE INDEX IF NOT EXISTS medication_doses_unique ON medication_doses (course_id, due_on, sequence)`,
   `CREATE INDEX IF NOT EXISTS medication_doses_course_idx ON medication_doses (course_id)`,
+
+  `CREATE TABLE IF NOT EXISTS lab_values (
+    id TEXT PRIMARY KEY,
+    pet_id TEXT NOT NULL REFERENCES pets(id) ON DELETE CASCADE,
+    document_id TEXT REFERENCES documents(id) ON DELETE SET NULL,
+    analyte TEXT NOT NULL,
+    value REAL NOT NULL,
+    unit TEXT NOT NULL,
+    measured_on TEXT NOT NULL,
+    reference_min REAL,
+    reference_max REAL,
+    notes TEXT,
+    created_at TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS lab_values_pet_idx ON lab_values (pet_id, analyte, measured_on)`,
 
   `CREATE TABLE IF NOT EXISTS measurements (
     id TEXT PRIMARY KEY,

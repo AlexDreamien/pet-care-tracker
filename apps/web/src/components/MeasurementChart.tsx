@@ -1,9 +1,7 @@
-import type { Metric } from '@pet-care-tracker/core';
 import { type PointerEvent, type ReactNode, useMemo, useState } from 'react';
-import type { Reading } from '../api/types';
 import { useSession } from '../app/session';
-import { buildChart, nearestPoint, type ChartPoint } from '../lib/chart';
-import { formatDate, formatMeasurement } from '../lib/format';
+import { buildChart, type ChartReading, nearestPoint, type ChartPoint } from '../lib/chart';
+import { formatDate } from '../lib/format';
 
 const WIDTH = 640;
 const HEIGHT = 220;
@@ -11,22 +9,21 @@ const HEIGHT = 220;
 const PADDING = { top: 12, right: 16, bottom: 28, left: 48 };
 
 /**
- * One metric over time.
+ * One series of numbers over time.
  *
- * A single series, so it needs no legend — the heading names it. The target corridor is a
- * background band rather than a second series: it is context for the line, not another
- * thing to compare it with.
+ * A single series, so it needs no legend — the heading names it. The band behind it is a
+ * corridor or a reference range: context for the line, not another thing to compare it
+ * with. Formatting is the caller's, because a weight and a blood value have nothing in
+ * common but the arithmetic.
  */
-export function MeasurementChart({
-  metric,
+export function ValueChart({
   readings,
   target,
-  unitSystem,
+  format,
 }: {
-  metric: Metric;
-  readings: Reading[];
+  readings: ChartReading[];
   target: { min: number | null; max: number | null } | null;
-  unitSystem: 'metric' | 'imperial';
+  format: (value: number) => string;
 }): ReactNode {
   const { locale } = useSession();
   const [hovered, setHovered] = useState<ChartPoint | null>(null);
@@ -54,15 +51,13 @@ export function MeasurementChart({
     setHovered(nearestPoint(chart.points, x));
   };
 
-  const label = (value: number) => formatMeasurement(metric, value, unitSystem, locale);
-
   return (
     <figure className="m-0">
       <svg
         viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
         className="w-full touch-pan-y"
         role="img"
-        aria-label={`${label(active.value)}, ${formatDate(active.measuredOn, locale)}`}
+        aria-label={`${format(active.value)}, ${formatDate(active.measuredOn, locale)}`}
         onPointerMove={onPointer}
         onPointerLeave={() => setHovered(null)}
       >
@@ -143,7 +138,7 @@ export function MeasurementChart({
           textAnchor={active.x > WIDTH - 120 ? 'end' : 'start'}
           className="fill-ink text-[12px] font-medium"
         >
-          {label(active.value)}
+          {format(active.value)}
         </text>
       </svg>
 

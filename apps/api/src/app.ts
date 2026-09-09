@@ -21,6 +21,7 @@ import { registerFileRoutes } from './routes/files';
 import { registerHouseholdRoutes } from './routes/households';
 import { registerLostTagRoutes } from './routes/lostTag';
 import { registerMeasurementRoutes } from './routes/measurements';
+import { registerLabRoutes } from './routes/lab';
 import { registerMedicalRoutes } from './routes/medical';
 import { registerPetRoutes } from './routes/pets';
 import { registerSitterRoutes } from './routes/sitter';
@@ -126,6 +127,7 @@ export async function buildApp(options: BuildAppOptions): Promise<FastifyInstanc
       registerSitterRoutes(api, context);
       registerDocumentRoutes(api, context);
       registerMedicalRoutes(api, context);
+      registerLabRoutes(api, context);
       registerMeasurementRoutes(api, context);
       registerContactRoutes(api, context);
       registerEventRoutes(api, context);

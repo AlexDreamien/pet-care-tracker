@@ -9,6 +9,7 @@ import { Badge, Card } from '../ui/primitives';
 import { PetAvatar } from './PetsPage';
 import { DocumentsTab } from './pet/DocumentsTab';
 import { FoodTab } from './pet/FoodTab';
+import { LabTab } from './pet/LabTab';
 import { MeasurementsTab } from './pet/MeasurementsTab';
 import { MedicalTab } from './pet/MedicalTab';
 import { ProfileTab } from './pet/ProfileTab';
@@ -19,6 +20,7 @@ const TABS: { path: string; key: MessageKey }[] = [
   { path: 'medical', key: 'tab.medical' },
   { path: 'measurements', key: 'tab.measurements' },
   { path: 'food', key: 'tab.food' },
+  { path: 'labs', key: 'tab.labs' },
   { path: 'documents', key: 'tab.documents' },
   { path: 'schedule', key: 'tab.schedule' },
 ];
@@ -82,9 +84,18 @@ export function PetPage(): ReactNode {
               <NavLink
                 to={tab.path === '' ? `/pets/${record.id}` : `/pets/${record.id}/${tab.path}`}
                 end={tab.path === ''}
+                // The strip scrolls, so a tab opened by URL has to be brought into view or
+                // nothing on screen says which one you are looking at.
+                ref={(node) => {
+                  if (node?.classList.contains('is-active')) {
+                    node.scrollIntoView({ block: 'nearest', inline: 'center' });
+                  }
+                }}
                 className={({ isActive }) =>
                   `inline-flex min-h-10 items-center rounded-full px-3.5 text-sm whitespace-nowrap ${
-                    isActive ? 'bg-brand text-white' : 'border border-line bg-surface text-muted'
+                    isActive
+                      ? 'is-active bg-brand text-white'
+                      : 'border border-line bg-surface text-muted'
                   }`
                 }
               >
@@ -100,6 +111,7 @@ export function PetPage(): ReactNode {
         <Route path="medical" element={<MedicalTab pet={record} onChanged={pet.reload} />} />
         <Route path="measurements" element={<MeasurementsTab pet={record} />} />
         <Route path="food" element={<FoodTab pet={record} />} />
+        <Route path="labs" element={<LabTab pet={record} />} />
         <Route path="documents" element={<DocumentsTab pet={record} />} />
         <Route path="schedule" element={<ScheduleTab pet={record} />} />
         <Route path="*" element={<Navigate to={`/pets/${record.id}`} replace />} />

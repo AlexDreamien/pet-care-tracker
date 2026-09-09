@@ -4,7 +4,7 @@ import { api } from '../../api/client';
 import type { MeasurementSeries, Pet, SizeCardEntry } from '../../api/types';
 import { useAction, useResource, useToday } from '../../app/hooks';
 import { useSession, useUser } from '../../app/session';
-import { MeasurementChart } from '../../components/MeasurementChart';
+import { ValueChart } from '../../components/MeasurementChart';
 import { formatDate, formatMeasurement, isStale } from '../../lib/format';
 import type { MessageKey } from '../../lib/i18n';
 import {
@@ -108,11 +108,10 @@ export function MeasurementsTab({ pet }: { pet: Pet }): ReactNode {
               )}
             </div>
 
-            <MeasurementChart
-              metric={entry.metric}
+            <ValueChart
               readings={entry.readings}
               target={entry.target}
-              unitSystem={user.unitSystem}
+              format={(value) => formatMeasurement(entry.metric, value, user.unitSystem, locale)}
             />
 
             {/* The table view: every value the chart draws is also readable as text. */}

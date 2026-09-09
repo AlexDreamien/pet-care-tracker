@@ -279,6 +279,31 @@ export const medicationCourseSchema = z
     path: ['endsOn'],
   });
 
+/**
+ * A value off a laboratory form.
+ *
+ * The reference range is optional and comes from the form; the application never supplies
+ * one of its own.
+ */
+export const labValueSchema = z
+  .object({
+    analyte: requiredText(60),
+    value: z.number().finite(),
+    unit: requiredText(20),
+    measuredOn: isoDateSchema,
+    referenceMin: z.number().finite().optional(),
+    referenceMax: z.number().finite().optional(),
+    documentId: z.uuid().optional(),
+    notes: optionalText(500),
+  })
+  .refine(
+    (row) =>
+      row.referenceMin === undefined ||
+      row.referenceMax === undefined ||
+      row.referenceMin <= row.referenceMax,
+    { message: 'the lower bound must not exceed the upper bound', path: ['referenceMin'] },
+  );
+
 // -- measurements -------------------------------------------------------------------------
 
 export const measurementSchema = z.object({
@@ -435,3 +460,4 @@ export type FoodBagInput = z.infer<typeof foodBagSchema>;
 export type ExpenseInput = z.infer<typeof expenseSchema>;
 export type LostTagInput = z.infer<typeof lostTagSchema>;
 export type SitterLinkInput = z.infer<typeof sitterLinkSchema>;
+export type LabValueInput = z.infer<typeof labValueSchema>;

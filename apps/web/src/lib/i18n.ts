@@ -20,6 +20,22 @@ const ru = {
   'nav.expenses': 'Расходы',
 
   'tab.food': 'Питание',
+  'tab.labs': 'Анализы',
+
+  'lab.add': 'Добавить показатель',
+  'lab.analyte': 'Показатель',
+  'lab.value': 'Значение',
+  'lab.unit': 'Единицы',
+  'lab.referenceMin': 'Норма от',
+  'lab.referenceMax': 'до',
+  'lab.reference': 'Норма лаборатории:',
+  'lab.referenceHint': 'Перепишите с бланка — у разных лабораторий нормы разные',
+  'lab.below': 'ниже нормы',
+  'lab.within': 'в норме',
+  'lab.above': 'выше нормы',
+  'lab.mixedUnits': 'разные единицы — график не строится',
+  'lab.notAdvice':
+    'Приложение только хранит числа и рисует их относительно нормы с бланка. Что они значат — вопрос к врачу.',
 
   'found.title': 'Я потерялся',
   'found.call': 'Позвонить',
@@ -399,6 +415,22 @@ const en: Record<MessageKey, string> = {
   'nav.expenses': 'Spending',
 
   'tab.food': 'Food',
+  'tab.labs': 'Labs',
+
+  'lab.add': 'Add a result',
+  'lab.analyte': 'Analyte',
+  'lab.value': 'Value',
+  'lab.unit': 'Unit',
+  'lab.referenceMin': 'Reference from',
+  'lab.referenceMax': 'to',
+  'lab.reference': 'Laboratory range:',
+  'lab.referenceHint': 'Copy it off the form — ranges differ between laboratories',
+  'lab.below': 'below range',
+  'lab.within': 'in range',
+  'lab.above': 'above range',
+  'lab.mixedUnits': 'mixed units — no chart',
+  'lab.notAdvice':
+    'The application stores the numbers and draws them against the range on the form. What they mean is a question for a vet.',
 
   'found.title': 'I am lost',
   'found.call': 'Call',

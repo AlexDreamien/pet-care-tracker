@@ -104,6 +104,10 @@ which plain `node` cannot resolve. Use the scripts, not `node src/…`.
   a converted value breaks every past reading.
 - **Deploy by pushing to `main`.** A manual `flyctl deploy` races the CI deployment — the
   sibling bot in this workspace lost its machine to exactly that.
+- **Reference ranges come from the laboratory's form, never from the application.** They
+  differ between laboratories, species and machines. `lab_values` stores the range per
+  reading for that reason, and a value with no range gets no verdict rather than a guessed
+  one.
 - **The app does not give medical advice.** No symptom checking, no diagnosis, no dosage
   recommendation. Built-in schedules are reminder defaults the owner can edit.
 
