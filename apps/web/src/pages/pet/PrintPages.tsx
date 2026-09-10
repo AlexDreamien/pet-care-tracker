@@ -10,6 +10,7 @@ import type {
 } from '../../api/types';
 import { useResource, useToday } from '../../app/hooks';
 import { useSession, useUser } from '../../app/session';
+import { BackHome } from '../../components/BackHome';
 import { QrCode } from '../../components/QrCode';
 import { formatAge, formatDate } from '../../lib/format';
 import type { MessageKey } from '../../lib/i18n';
@@ -55,6 +56,8 @@ export function TagPrintPage(): ReactNode {
 
   return (
     <div className="print-sheet mx-auto max-w-md p-8 text-center">
+      {/* On screen only: the print stylesheet drops it, so it never lands on the tag. */}
+      <BackHome className="text-left" />
       {/* Two copies: one for the collar, one for the carrier or the lead. */}
       {[0, 1].map((copy) => (
         <div key={copy} className="mb-10 rounded-2xl border-2 border-black p-5">
@@ -110,6 +113,7 @@ export function CardPrintPage(): ReactNode {
 
   return (
     <div className="print-sheet mx-auto max-w-2xl p-8">
+      <BackHome />
       <header className="mb-4 flex items-baseline justify-between border-b-2 border-black pb-2">
         <h1 className="text-2xl font-bold">{record.name}</h1>
         <p className="text-sm">{formatDate(today, locale)}</p>

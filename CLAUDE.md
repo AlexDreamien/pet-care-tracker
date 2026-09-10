@@ -73,7 +73,7 @@ API to `apps/api/build/server.js` and the container starts that with plain `node
   years. Both are unit-tested; keep them so.
 - **The agenda window starts today, so anything overdue must be carried into it.**
   `datesInWindow` pulls an unmet date forward — at most one occurrence per recurring
-  series. Without it the home screen looks reassuringly empty while hiding exactly what is
+  series. Without it the Today screen looks reassuringly empty while hiding exactly what is
   late.
 - **`@theme` cannot be nested in a media query.** Tailwind 4 hoists the declarations out,
   so a `@theme` inside `prefers-color-scheme: dark` silently overwrites the light palette

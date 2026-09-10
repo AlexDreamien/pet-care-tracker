@@ -45,7 +45,7 @@ export function ProfileTab({ pet, onChanged }: { pet: Pet; onChanged: () => void
   const archive = useAction(async () => {
     await api.post(`/pets/${pet.id}/${pet.archivedAt ? 'restore' : 'archive'}`);
     onChanged();
-    if (!pet.archivedAt) navigate('/pets');
+    if (!pet.archivedAt) navigate('/');
   });
 
   return (

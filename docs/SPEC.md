@@ -281,7 +281,7 @@ GET           /calendar/:token.ics            — public by token, no cookie
 GET           /export            — full household export as JSON + files, one archive
 ```
 
-`GET /agenda` is the endpoint the home screen and the ICS feed both read. Merging
+`GET /agenda` is the endpoint the Today screen and the ICS feed both read. Merging
 scheduled events with dates derived from `next_due_at` and document expiry happens in one
 pure core function used by both, so the calendar and the app can never disagree.
 

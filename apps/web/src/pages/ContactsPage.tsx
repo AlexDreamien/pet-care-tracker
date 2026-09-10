@@ -3,6 +3,7 @@ import { api } from '../api/client';
 import type { Contact } from '../api/types';
 import { useAction, useResource } from '../app/hooks';
 import { useSession } from '../app/session';
+import { BackHome } from '../components/BackHome';
 import type { MessageKey } from '../lib/i18n';
 import { Button, Card, Empty, Field, Input, Select, Sheet, TextArea } from '../ui/primitives';
 
@@ -15,6 +16,8 @@ export function ContactsPage(): ReactNode {
 
   return (
     <>
+      <BackHome />
+
       <header className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-semibold">{t('nav.contacts')}</h1>
         {canWrite && <Button onClick={() => setAdding(true)}>{t('action.add')}</Button>}

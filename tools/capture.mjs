@@ -327,8 +327,8 @@ async function main() {
     console.log(`${name}.png`);
   };
 
-  await shoot('/', 'agenda', 'text=Просрочено');
-  await shoot('/pets', 'pets', 'text=Рекс');
+  await shoot('/', 'pets', 'text=Рекс');
+  await shoot('/agenda', 'agenda', 'text=Просрочено');
   await shoot(`/pets/${rex.id}`, 'pet-profile', 'text=Курица');
   await shoot(`/pets/${rex.id}/medical`, 'medical', 'text=Прививки');
   await shoot(`/pets/${rex.id}/measurements`, 'measurements', 'svg');

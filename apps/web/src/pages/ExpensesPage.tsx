@@ -4,6 +4,7 @@ import { api } from '../api/client';
 import type { Pet } from '../api/types';
 import { useAction, useResource, useToday } from '../app/hooks';
 import { useSession, useUser } from '../app/session';
+import { BackHome } from '../components/BackHome';
 import { formatDate } from '../lib/format';
 import type { MessageKey } from '../lib/i18n';
 import { Button, Card, Empty, Field, Input, Select, SectionTitle, Sheet } from '../ui/primitives';
@@ -64,6 +65,8 @@ export function ExpensesPage(): ReactNode {
 
   return (
     <>
+      <BackHome />
+
       <header className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-semibold">{t('nav.expenses')}</h1>
         {canWrite && <Button onClick={() => setAdding(true)}>{t('action.add')}</Button>}

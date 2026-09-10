@@ -13,6 +13,7 @@ export const LOCALES: Locale[] = ['ru', 'en'];
 const ru = {
   'app.name': 'Питомец',
 
+  'nav.home': 'На главную',
   'nav.agenda': 'Сегодня',
   'nav.pets': 'Питомцы',
   'nav.contacts': 'Контакты',
@@ -428,6 +429,7 @@ export type MessageKey = keyof typeof ru;
 const en: Record<MessageKey, string> = {
   'app.name': 'Pet',
 
+  'nav.home': 'Home',
   'nav.agenda': 'Today',
   'nav.pets': 'Pets',
   'nav.contacts': 'Contacts',

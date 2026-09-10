@@ -28,6 +28,14 @@ function Icon({ children, className = 'size-5' }: IconProps & { children: ReactN
   );
 }
 
+export function BackIcon(props: IconProps): ReactNode {
+  return (
+    <Icon {...props}>
+      <path d="M15 5l-7 7 7 7" />
+    </Icon>
+  );
+}
+
 export function CalendarIcon(props: IconProps): ReactNode {
   return (
     <Icon {...props}>

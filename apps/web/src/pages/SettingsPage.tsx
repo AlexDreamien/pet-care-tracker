@@ -6,6 +6,7 @@ import { useAction, useResource } from '../app/hooks';
 import { useSession, useUser } from '../app/session';
 import { formatDate, optionsIncluding } from '../lib/format';
 import { LOCALES, type MessageKey } from '../lib/i18n';
+import { BackHome } from '../components/BackHome';
 import { NotificationsSection } from './NotificationsSection';
 import { SitterLinksSection } from './SitterLinksSection';
 import { Button, Card, Field, Input, Select, SectionTitle } from '../ui/primitives';
@@ -34,7 +35,10 @@ export function SettingsPage(): ReactNode {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">{t('nav.settings')}</h1>
+      <div>
+        <BackHome />
+        <h1 className="text-2xl font-semibold">{t('nav.settings')}</h1>
+      </div>
 
       <ProfileCard onSaved={refresh} />
 

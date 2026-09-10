@@ -6,6 +6,7 @@ import { useResource } from '../app/hooks';
 import { useAction } from '../app/hooks';
 import { useSession } from '../app/session';
 import { PetForm, petToValues, valuesToPayload } from '../components/PetForm';
+import { PasskeyOffer } from './PasskeyOffer';
 import { formatAge, initials } from '../lib/format';
 import { Badge, Button, Card, Empty, Sheet } from '../ui/primitives';
 
@@ -47,6 +48,9 @@ export function PetsPage(): ReactNode {
 
   return (
     <>
+      {/* Home is where the offer belongs: the first thing seen after a password sign-in. */}
+      <PasskeyOffer />
+
       <header className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-semibold">{t('nav.pets')}</h1>
         {canWrite && <Button onClick={() => setAdding(true)}>{t('action.add')}</Button>}

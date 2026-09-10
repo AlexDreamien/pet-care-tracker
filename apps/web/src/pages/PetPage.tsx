@@ -5,6 +5,7 @@ import { useResource } from '../app/hooks';
 import { useSession } from '../app/session';
 import { formatAge, formatDate } from '../lib/format';
 import type { MessageKey } from '../lib/i18n';
+import { BackHome } from '../components/BackHome';
 import { Badge, Card } from '../ui/primitives';
 import { PetAvatar } from './PetsPage';
 import { DocumentsTab } from './pet/DocumentsTab';
@@ -58,6 +59,8 @@ export function PetPage(): ReactNode {
 
   return (
     <>
+      <BackHome />
+
       <Card className="mb-4">
         <div className="flex items-center gap-4">
           <PetAvatar pet={record} size={64} />

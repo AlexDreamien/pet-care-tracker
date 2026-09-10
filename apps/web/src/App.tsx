@@ -17,8 +17,8 @@ import { CalendarIcon, ContactsIcon, PawIcon, SettingsIcon, WalletIcon } from '.
 
 const TABS: { to: string; key: MessageKey; Icon: (props: { className?: string }) => ReactNode }[] =
   [
-    { to: '/', key: 'nav.agenda', Icon: CalendarIcon },
-    { to: '/pets', key: 'nav.pets', Icon: PawIcon },
+    { to: '/', key: 'nav.pets', Icon: PawIcon },
+    { to: '/agenda', key: 'nav.agenda', Icon: CalendarIcon },
     { to: '/expenses', key: 'nav.expenses', Icon: WalletIcon },
     { to: '/contacts', key: 'nav.contacts', Icon: ContactsIcon },
     { to: '/settings', key: 'nav.settings', Icon: SettingsIcon },
@@ -66,8 +66,11 @@ function SignedInApp(): ReactNode {
       {/* Space at the bottom keeps the last row clear of the navigation bar. */}
       <main className="mx-auto w-full max-w-3xl px-4 pt-4 pb-28">
         <Routes>
-          <Route path="/" element={<AgendaPage />} />
-          <Route path="/pets" element={<PetsPage />} />
+          {/* The pet list is home: it is what the app is about, and where a record starts. */}
+          <Route path="/" element={<PetsPage />} />
+          <Route path="/agenda" element={<AgendaPage />} />
+          {/* The list used to live here; old bookmarks and installed shortcuts still do. */}
+          <Route path="/pets" element={<Navigate to="/" replace />} />
           <Route path="/pets/:petId/print/tag" element={<TagPrintPage />} />
           <Route path="/pets/:petId/print/card" element={<CardPrintPage />} />
           <Route path="/pets/:petId/*" element={<PetPage />} />

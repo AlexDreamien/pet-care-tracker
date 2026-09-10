@@ -16,7 +16,7 @@ import {
   SyringeIcon,
 } from '../ui/icons';
 import { Badge, Button, Card, Empty, SectionTitle } from '../ui/primitives';
-import { PasskeyOffer } from './PasskeyOffer';
+import { BackHome } from '../components/BackHome';
 
 const SOURCE_ICON: Record<string, (props: { className?: string }) => ReactNode> = {
   vaccination: SyringeIcon,
@@ -98,7 +98,7 @@ export function AgendaPage(): ReactNode {
 
   return (
     <>
-      <PasskeyOffer />
+      <BackHome />
 
       <h1 className="mb-4 text-2xl font-semibold">{t('nav.agenda')}</h1>
 

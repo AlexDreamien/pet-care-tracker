@@ -212,7 +212,7 @@ export async function dispatchDueReminders(
             rest > 0
               ? `${describeWhen(days, member.locale)} · +${rest}`
               : describeWhen(days, member.locale),
-          url: `${config.PUBLIC_ORIGIN}/`,
+          url: `${config.PUBLIC_ORIGIN}/agenda`,
         },
         now,
       );
