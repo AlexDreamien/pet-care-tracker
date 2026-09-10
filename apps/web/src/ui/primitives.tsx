@@ -4,6 +4,7 @@ import type {
   ReactNode,
   SelectHTMLAttributes,
 } from 'react';
+import { CloseIcon } from './icons';
 
 /**
  * The small set of pieces every screen is built from.
@@ -12,29 +13,41 @@ import type {
  * lead or an animal that would rather be elsewhere.
  */
 
-type ButtonTone = 'primary' | 'quiet' | 'danger';
+export type ButtonTone = 'primary' | 'quiet' | 'danger';
 
 const BUTTON_TONES: Record<ButtonTone, string> = {
-  primary: 'bg-brand text-white hover:opacity-90',
-  quiet: 'bg-surface text-ink border border-line hover:bg-brand-soft',
+  primary: 'bg-brand text-white shadow-button hover:opacity-90',
+  quiet: 'bg-surface text-brand border border-brand/25 hover:bg-brand-soft',
   danger: 'bg-alarm-soft text-alarm border border-alarm/30 hover:bg-alarm/15',
 };
+
+/**
+ * The button look, for things that are links.
+ *
+ * A route to a print sheet or a `tel:` href is an `<a>` — it has to be, for a long-press
+ * and for the browser's own handling — but it should not look different from the button
+ * next to it.
+ */
+export function buttonClasses(tone: ButtonTone = 'primary', full = false): string {
+  return `inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-[0.95rem] font-medium transition disabled:cursor-not-allowed disabled:opacity-50 [&>svg]:size-5 [&>svg]:shrink-0 ${BUTTON_TONES[tone]} ${full ? 'w-full' : ''}`;
+}
 
 export function Button({
   tone = 'primary',
   full,
+  icon,
   children,
   className = '',
   ...rest
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
   tone?: ButtonTone;
   full?: boolean;
+  /** A glyph before the label — or alone, with an `aria-label`, for a compact control. */
+  icon?: ReactNode;
 }): ReactNode {
   return (
-    <button
-      {...rest}
-      className={`min-h-11 rounded-xl px-4 py-2.5 text-[0.95rem] font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${BUTTON_TONES[tone]} ${full ? 'w-full' : ''} ${className}`}
-    >
+    <button {...rest} className={`${buttonClasses(tone, full)} ${className}`}>
+      {icon}
       {children}
     </button>
   );
@@ -48,9 +61,37 @@ export function Card({
   className?: string;
 }): ReactNode {
   return (
-    <section className={`rounded-(--radius-card) border border-line bg-surface p-4 ${className}`}>
+    <section
+      className={`rounded-(--radius-card) border border-line bg-surface p-4 shadow-card ${className}`}
+    >
       {children}
     </section>
+  );
+}
+
+/**
+ * A screen's title with its glyph on a soft tile.
+ *
+ * The tile is the same one that marks the screen in the bottom bar, so the two read as
+ * the same place.
+ */
+export function PageHeader({
+  icon,
+  title,
+  action,
+}: {
+  icon: ReactNode;
+  title: string;
+  action?: ReactNode;
+}): ReactNode {
+  return (
+    <header className="mb-4 flex items-center gap-3">
+      <span className="grid size-11 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand [&>svg]:size-6">
+        {icon}
+      </span>
+      <h1 className="min-w-0 flex-1 truncate text-2xl font-semibold">{title}</h1>
+      {action}
+    </header>
   );
 }
 
@@ -134,20 +175,40 @@ export function Badge({
   );
 }
 
-export function Empty({ children }: { children: ReactNode }): ReactNode {
-  return <p className="py-8 text-center text-sm text-muted">{children}</p>;
+/**
+ * Nothing here yet — said kindly.
+ *
+ * An empty list is the first thing a new owner sees on most screens, so it gets a glyph
+ * and a dashed frame rather than one grey line that looks like a loading error.
+ */
+export function Empty({ icon, children }: { icon?: ReactNode; children: ReactNode }): ReactNode {
+  return (
+    <div className="flex flex-col items-center gap-2 rounded-(--radius-card) border border-dashed border-line px-4 py-8 text-center">
+      {icon && (
+        <span className="grid size-12 place-items-center rounded-full bg-brand-soft text-brand [&>svg]:size-6">
+          {icon}
+        </span>
+      )}
+      <p className="text-sm text-muted">{children}</p>
+    </div>
+  );
 }
 
 export function SectionTitle({
+  icon,
   children,
   action,
 }: {
+  icon?: ReactNode;
   children: ReactNode;
   action?: ReactNode;
 }): ReactNode {
   return (
-    <div className="mb-2 flex items-center justify-between gap-3">
-      <h2 className="text-sm font-semibold tracking-wide text-muted uppercase">{children}</h2>
+    <div className="mb-2 flex min-h-11 items-center justify-between gap-3">
+      <h2 className="flex items-center gap-2 text-sm font-semibold tracking-wide text-brand uppercase [&>svg]:size-5 [&>svg]:shrink-0">
+        {icon}
+        {children}
+      </h2>
       {action}
     </div>
   );
@@ -183,9 +244,13 @@ export function Sheet({
       <div className="relative max-h-[90vh] w-full overflow-y-auto rounded-t-2xl border border-line bg-canvas p-4 sm:max-w-lg sm:rounded-2xl">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-lg font-semibold">{title}</h2>
-          <Button tone="quiet" onClick={onClose} className="px-3 py-1">
-            ✕
-          </Button>
+          <Button
+            tone="quiet"
+            icon={<CloseIcon />}
+            aria-label="close"
+            onClick={onClose}
+            className="px-3"
+          />
         </div>
         {children}
       </div>

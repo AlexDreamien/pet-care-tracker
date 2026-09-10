@@ -6,6 +6,7 @@ import { useAction, useResource, useToday } from '../../app/hooks';
 import { useSession, useUser } from '../../app/session';
 import { formatDate, formatRelativeDays } from '../../lib/format';
 import type { MessageKey } from '../../lib/i18n';
+import { CheckIcon, ClockIcon, PlusIcon } from '../../ui/icons';
 import { Badge, Button, Card, Empty, Field, Input, Select, Sheet } from '../../ui/primitives';
 
 const EVENT_TYPES = [
@@ -34,13 +35,13 @@ export function ScheduleTab({ pet }: { pet: Pet }): ReactNode {
   return (
     <div className="space-y-4">
       {canWrite && (
-        <Button full onClick={() => setAdding(true)}>
+        <Button full onClick={() => setAdding(true)} icon={<PlusIcon />}>
           {t('event.new')}
         </Button>
       )}
 
       {(events.data?.events.length ?? 0) === 0 && !events.loading && (
-        <Empty>{t('state.empty')}</Empty>
+        <Empty icon={<ClockIcon />}>{t('state.empty')}</Empty>
       )}
 
       <ul className="space-y-3">
@@ -112,6 +113,7 @@ function EventRow({
           className="mt-3"
           disabled={complete.pending}
           onClick={() => void complete.run()}
+          icon={<CheckIcon />}
         >
           {t('action.done')}
         </Button>
@@ -236,6 +238,7 @@ function EventSheet({
           full
           disabled={create.pending || title.trim() === ''}
           onClick={() => void create.run()}
+          icon={<CheckIcon />}
         >
           {t('action.save')}
         </Button>

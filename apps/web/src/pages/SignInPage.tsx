@@ -3,6 +3,7 @@ import { type FormEvent, type ReactNode, useState } from 'react';
 import { api } from '../api/client';
 import { useAction, useResource } from '../app/hooks';
 import { useSession } from '../app/session';
+import { CheckIcon, KeyIcon } from '../ui/icons';
 import { Button, Card, Field, Input } from '../ui/primitives';
 
 type Mode = 'signIn' | 'register';
@@ -60,7 +61,7 @@ export function SignInPage(): ReactNode {
           <p className="mb-4 rounded-xl bg-brand-soft px-4 py-3 text-center font-mono text-lg tracking-wider text-brand select-all">
             {recoveryCode}
           </p>
-          <Button full onClick={() => void refresh()}>
+          <Button full onClick={() => void refresh()} icon={<CheckIcon />}>
             {t('auth.recoverySaved')}
           </Button>
         </Card>
@@ -154,6 +155,7 @@ export function SignInPage(): ReactNode {
                 className="mt-3"
                 disabled={passkey.pending}
                 onClick={() => void passkey.run()}
+                icon={<KeyIcon />}
               >
                 {t('auth.passkeySignIn')}
               </Button>

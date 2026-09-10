@@ -4,6 +4,7 @@ import { api } from '../api/client';
 import type { Passkey } from '../api/types';
 import { useAction } from '../app/hooks';
 import { useSession } from '../app/session';
+import { KeyIcon } from '../ui/icons';
 import { Button, Card } from '../ui/primitives';
 
 const DISMISSED = 'pct.passkeyOfferDismissed';
@@ -69,6 +70,7 @@ export function PasskeyOffer(): ReactNode {
               if (ok) dismiss();
             });
           }}
+          icon={<KeyIcon />}
         >
           {t('auth.passkeyAdd')}
         </Button>

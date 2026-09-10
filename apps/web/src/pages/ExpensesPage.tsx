@@ -7,7 +7,18 @@ import { useSession, useUser } from '../app/session';
 import { BackHome } from '../components/BackHome';
 import { formatDate } from '../lib/format';
 import type { MessageKey } from '../lib/i18n';
-import { Button, Card, Empty, Field, Input, Select, SectionTitle, Sheet } from '../ui/primitives';
+import { CheckIcon, PlusIcon, WalletIcon } from '../ui/icons';
+import {
+  Button,
+  Card,
+  Empty,
+  Field,
+  Input,
+  PageHeader,
+  Select,
+  SectionTitle,
+  Sheet,
+} from '../ui/primitives';
 
 interface ExpenseEntry {
   id: string;
@@ -67,10 +78,17 @@ export function ExpensesPage(): ReactNode {
     <>
       <BackHome />
 
-      <header className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{t('nav.expenses')}</h1>
-        {canWrite && <Button onClick={() => setAdding(true)}>{t('action.add')}</Button>}
-      </header>
+      <PageHeader
+        icon={<WalletIcon />}
+        title={t('nav.expenses')}
+        action={
+          canWrite && (
+            <Button onClick={() => setAdding(true)} icon={<PlusIcon />}>
+              {t('action.add')}
+            </Button>
+          )
+        }
+      />
 
       {/* One filter row above everything it scopes. */}
       <div className="mb-4 flex gap-2">
@@ -101,7 +119,9 @@ export function ExpensesPage(): ReactNode {
             </p>
           </Card>
 
-          {summary.byCategory.length === 0 && <Empty>{t('state.empty')}</Empty>}
+          {summary.byCategory.length === 0 && (
+            <Empty icon={<WalletIcon />}>{t('state.empty')}</Empty>
+          )}
 
           {summary.byCategory.length > 0 && (
             <section>
@@ -314,6 +334,7 @@ function AddExpenseSheet({
           full
           disabled={save.pending || amount.trim() === ''}
           onClick={() => void save.run()}
+          icon={<CheckIcon />}
         >
           {t('action.save')}
         </Button>

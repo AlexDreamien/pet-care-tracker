@@ -6,6 +6,15 @@ import { useSession } from '../app/session';
 import { formatAge, formatDate } from '../lib/format';
 import type { MessageKey } from '../lib/i18n';
 import { BackHome } from '../components/BackHome';
+import {
+  BowlIcon,
+  ClockIcon,
+  DocumentIcon,
+  FlaskIcon,
+  HeartIcon,
+  ScaleIcon,
+  UserIcon,
+} from '../ui/icons';
 import { Badge, Card } from '../ui/primitives';
 import { PetAvatar } from './PetsPage';
 import { DocumentsTab } from './pet/DocumentsTab';
@@ -16,14 +25,18 @@ import { MedicalTab } from './pet/MedicalTab';
 import { ProfileTab } from './pet/ProfileTab';
 import { ScheduleTab } from './pet/ScheduleTab';
 
-const TABS: { path: string; key: MessageKey }[] = [
-  { path: '', key: 'tab.profile' },
-  { path: 'medical', key: 'tab.medical' },
-  { path: 'measurements', key: 'tab.measurements' },
-  { path: 'food', key: 'tab.food' },
-  { path: 'labs', key: 'tab.labs' },
-  { path: 'documents', key: 'tab.documents' },
-  { path: 'schedule', key: 'tab.schedule' },
+const TABS: {
+  path: string;
+  key: MessageKey;
+  Icon: (props: { className?: string }) => ReactNode;
+}[] = [
+  { path: '', key: 'tab.profile', Icon: UserIcon },
+  { path: 'medical', key: 'tab.medical', Icon: HeartIcon },
+  { path: 'measurements', key: 'tab.measurements', Icon: ScaleIcon },
+  { path: 'food', key: 'tab.food', Icon: BowlIcon },
+  { path: 'labs', key: 'tab.labs', Icon: FlaskIcon },
+  { path: 'documents', key: 'tab.documents', Icon: DocumentIcon },
+  { path: 'schedule', key: 'tab.schedule', Icon: ClockIcon },
 ];
 
 /**
@@ -95,13 +108,14 @@ export function PetPage(): ReactNode {
                   }
                 }}
                 className={({ isActive }) =>
-                  `inline-flex min-h-10 items-center rounded-full px-3.5 text-sm whitespace-nowrap ${
+                  `inline-flex min-h-10 items-center gap-1.5 rounded-full py-1 pr-4 pl-3 text-sm whitespace-nowrap transition ${
                     isActive
-                      ? 'is-active bg-brand text-white'
-                      : 'border border-line bg-surface text-muted'
+                      ? 'is-active bg-brand text-white shadow-button'
+                      : 'border border-line bg-surface text-ink hover:border-brand/40'
                   }`
                 }
               >
+                <tab.Icon className="size-4.5" />
                 {t(tab.key)}
               </NavLink>
             </li>

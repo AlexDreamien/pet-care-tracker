@@ -9,13 +9,18 @@ import type { MessageKey } from '../lib/i18n';
 import {
   BowlIcon,
   CakeIcon,
+  CalendarIcon,
+  CheckIcon,
+  ChevronRightIcon,
+  ClockIcon,
   DocumentIcon,
   PawIcon,
   PillIcon,
+  RefreshIcon,
   ShieldIcon,
   SyringeIcon,
 } from '../ui/icons';
-import { Badge, Button, Card, Empty, SectionTitle } from '../ui/primitives';
+import { Badge, Button, Card, Empty, PageHeader, SectionTitle } from '../ui/primitives';
 import { BackHome } from '../components/BackHome';
 
 const SOURCE_ICON: Record<string, (props: { className?: string }) => ReactNode> = {
@@ -61,7 +66,13 @@ function Row({ item, today }: { item: AgendaItem; today: string }): ReactNode {
 
   return (
     <li className="flex items-center gap-3 border-b border-line py-3 last:border-0">
-      <Glyph className={`size-5 shrink-0 ${late ? 'text-alarm' : 'text-muted'}`} />
+      <span
+        className={`grid size-10 shrink-0 place-items-center rounded-full ${
+          late ? 'bg-alarm-soft text-alarm' : 'bg-brand-soft text-brand'
+        }`}
+      >
+        <Glyph className="size-5" />
+      </span>
       <div className="min-w-0 flex-1">
         <p className="truncate font-medium">{itemLabel(item, t)}</p>
         <p className="truncate text-sm text-muted">
@@ -100,25 +111,27 @@ export function AgendaPage(): ReactNode {
     <>
       <BackHome />
 
-      <h1 className="mb-4 text-2xl font-semibold">{t('nav.agenda')}</h1>
+      <PageHeader icon={<CalendarIcon />} title={t('nav.agenda')} />
 
       {agenda.loading && <p className="text-muted">{t('state.loading')}</p>}
 
       {agenda.error && !agenda.data && (
         <Card>
           <p className="mb-3 text-sm text-muted">{t('state.error')}</p>
-          <Button tone="quiet" onClick={agenda.reload}>
+          <Button tone="quiet" onClick={agenda.reload} icon={<RefreshIcon />}>
             {t('action.retry')}
           </Button>
         </Card>
       )}
 
-      {empty && <Empty>{t('agenda.nothing')}</Empty>}
+      {empty && <Empty icon={<CheckIcon />}>{t('agenda.nothing')}</Empty>}
 
       <div className="space-y-5">
         {sections.overdue.length > 0 && (
           <section>
-            <SectionTitle>{t('agenda.overdue')}</SectionTitle>
+            <SectionTitle icon={<ClockIcon className="text-alarm" />}>
+              {t('agenda.overdue')}
+            </SectionTitle>
             <Card className="border-alarm/40">
               <ul>
                 {sections.overdue.map((item) => (
@@ -131,7 +144,7 @@ export function AgendaPage(): ReactNode {
 
         {sections.today.length > 0 && (
           <section>
-            <SectionTitle>{t('agenda.today')}</SectionTitle>
+            <SectionTitle icon={<CalendarIcon />}>{t('agenda.today')}</SectionTitle>
             <Card>
               <ul>
                 {sections.today.map((item) => (
@@ -144,7 +157,7 @@ export function AgendaPage(): ReactNode {
 
         {sections.upcoming.length > 0 && (
           <section>
-            <SectionTitle>{t('agenda.upcoming')}</SectionTitle>
+            <SectionTitle icon={<ChevronRightIcon />}>{t('agenda.upcoming')}</SectionTitle>
             <Card>
               <ul>
                 {sections.upcoming.map((item) => (

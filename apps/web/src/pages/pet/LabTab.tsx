@@ -7,6 +7,7 @@ import { useSession, useUser } from '../../app/session';
 import { ValueChart } from '../../components/MeasurementChart';
 import { formatDate } from '../../lib/format';
 import type { MessageKey } from '../../lib/i18n';
+import { CheckIcon, FlaskIcon, PlusIcon, TrashIcon } from '../../ui/icons';
 import { Badge, Button, Card, Empty, Field, Input, SectionTitle, Sheet } from '../../ui/primitives';
 
 /**
@@ -27,7 +28,7 @@ export function LabTab({ pet }: { pet: Pet }): ReactNode {
   return (
     <div className="space-y-6">
       {canWrite && (
-        <Button full onClick={() => setAdding(true)}>
+        <Button full onClick={() => setAdding(true)} icon={<PlusIcon />}>
           {t('lab.add')}
         </Button>
       )}
@@ -36,7 +37,9 @@ export function LabTab({ pet }: { pet: Pet }): ReactNode {
         {t('lab.notAdvice')}
       </p>
 
-      {(labs.data?.series.length ?? 0) === 0 && !labs.loading && <Empty>{t('state.empty')}</Empty>}
+      {(labs.data?.series.length ?? 0) === 0 && !labs.loading && (
+        <Empty icon={<FlaskIcon />}>{t('state.empty')}</Empty>
+      )}
 
       {labs.data?.series.map((series) => (
         <section key={series.analyte}>
@@ -106,7 +109,7 @@ function LabRow({
   reading: LabSeries['readings'][number];
   onDeleted: () => void;
 }): ReactNode {
-  const { locale, canWrite } = useSession();
+  const { t, locale, canWrite } = useSession();
 
   const remove = useAction(async () => {
     await api.delete(`/labs/${reading.id}`);
@@ -123,11 +126,11 @@ function LabRow({
         {canWrite && (
           <button
             type="button"
-            className="px-2 text-muted hover:text-alarm"
+            className="grid size-9 place-items-center rounded-full text-muted transition hover:bg-alarm-soft hover:text-alarm"
             onClick={() => void remove.run()}
-            aria-label="delete"
+            aria-label={t('action.delete')}
           >
-            ✕
+            <TrashIcon className="size-4.5" />
           </button>
         )}
       </span>
@@ -231,6 +234,7 @@ function AddLabSheet({
             save.pending || analyte.trim() === '' || unit.trim() === '' || value.trim() === ''
           }
           onClick={() => void save.run()}
+          icon={<CheckIcon />}
         >
           {t('action.save')}
         </Button>

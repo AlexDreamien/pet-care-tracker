@@ -14,6 +14,15 @@ import { useSession, useUser } from '../../app/session';
 import { formatDate } from '../../lib/format';
 import type { MessageKey } from '../../lib/i18n';
 import {
+  CheckIcon,
+  HeartIcon,
+  PillIcon,
+  PlusIcon,
+  ShieldIcon,
+  SyringeIcon,
+  TrashIcon,
+} from '../../ui/icons';
+import {
   Badge,
   Button,
   Card,
@@ -59,9 +68,10 @@ export function MedicalTab({ pet, onChanged }: { pet: Pet; onChanged: () => void
 
       <section>
         <SectionTitle
+          icon={<SyringeIcon />}
           action={
             canWrite && (
-              <Button tone="quiet" onClick={() => setSheet('vaccination')}>
+              <Button tone="quiet" onClick={() => setSheet('vaccination')} icon={<PlusIcon />}>
                 {t('action.add')}
               </Button>
             )
@@ -71,7 +81,7 @@ export function MedicalTab({ pet, onChanged }: { pet: Pet; onChanged: () => void
         </SectionTitle>
         <Card>
           {(vaccinations.data?.vaccinations.length ?? 0) === 0 ? (
-            <Empty>{t('state.empty')}</Empty>
+            <Empty icon={<SyringeIcon />}>{t('state.empty')}</Empty>
           ) : (
             <ul>
               {vaccinations.data?.vaccinations.map((row) => {
@@ -104,9 +114,10 @@ export function MedicalTab({ pet, onChanged }: { pet: Pet; onChanged: () => void
 
       <section>
         <SectionTitle
+          icon={<ShieldIcon />}
           action={
             canWrite && (
-              <Button tone="quiet" onClick={() => setSheet('parasite')}>
+              <Button tone="quiet" onClick={() => setSheet('parasite')} icon={<PlusIcon />}>
                 {t('action.add')}
               </Button>
             )
@@ -116,7 +127,7 @@ export function MedicalTab({ pet, onChanged }: { pet: Pet; onChanged: () => void
         </SectionTitle>
         <Card>
           {(parasites.data?.treatments.length ?? 0) === 0 ? (
-            <Empty>{t('state.empty')}</Empty>
+            <Empty icon={<ShieldIcon />}>{t('state.empty')}</Empty>
           ) : (
             <ul>
               {parasites.data?.treatments.map((row) => (
@@ -147,9 +158,10 @@ export function MedicalTab({ pet, onChanged }: { pet: Pet; onChanged: () => void
 
       <section>
         <SectionTitle
+          icon={<PillIcon />}
           action={
             canWrite && (
-              <Button tone="quiet" onClick={() => setSheet('medication')}>
+              <Button tone="quiet" onClick={() => setSheet('medication')} icon={<PlusIcon />}>
                 {t('action.add')}
               </Button>
             )
@@ -159,7 +171,7 @@ export function MedicalTab({ pet, onChanged }: { pet: Pet; onChanged: () => void
         </SectionTitle>
         <Card>
           {(medications.data?.medications.length ?? 0) === 0 ? (
-            <Empty>{t('state.empty')}</Empty>
+            <Empty icon={<PillIcon />}>{t('state.empty')}</Empty>
           ) : (
             <ul className="space-y-3">
               {medications.data?.medications.map((course) => (
@@ -176,9 +188,10 @@ export function MedicalTab({ pet, onChanged }: { pet: Pet; onChanged: () => void
 
       <section>
         <SectionTitle
+          icon={<HeartIcon />}
           action={
             canWrite && (
-              <Button tone="quiet" onClick={() => setSheet('visit')}>
+              <Button tone="quiet" onClick={() => setSheet('visit')} icon={<PlusIcon />}>
                 {t('action.add')}
               </Button>
             )
@@ -188,7 +201,7 @@ export function MedicalTab({ pet, onChanged }: { pet: Pet; onChanged: () => void
         </SectionTitle>
         <Card>
           {(visits.data?.visits.length ?? 0) === 0 ? (
-            <Empty>{t('state.empty')}</Empty>
+            <Empty icon={<HeartIcon />}>{t('state.empty')}</Empty>
           ) : (
             <ul>
               {visits.data?.visits.map((row) => (
@@ -205,9 +218,10 @@ export function MedicalTab({ pet, onChanged }: { pet: Pet; onChanged: () => void
 
       <section>
         <SectionTitle
+          icon={<HeartIcon />}
           action={
             canWrite && (
-              <Button tone="quiet" onClick={() => setSheet('flag')}>
+              <Button tone="quiet" onClick={() => setSheet('flag')} icon={<PlusIcon />}>
                 {t('action.add')}
               </Button>
             )
@@ -217,7 +231,7 @@ export function MedicalTab({ pet, onChanged }: { pet: Pet; onChanged: () => void
         </SectionTitle>
         <Card>
           {pet.flags.length === 0 ? (
-            <Empty>{t('flag.none')}</Empty>
+            <Empty icon={<HeartIcon />}>{t('flag.none')}</Empty>
           ) : (
             <ul>
               {pet.flags.map((flag) => (
@@ -294,9 +308,13 @@ function FlagRow({ flag, onChanged }: { flag: HealthFlag; onChanged: () => void 
         </p>
       </div>
       {canWrite && (
-        <Button tone="quiet" className="px-3" onClick={() => void remove.run()}>
-          ✕
-        </Button>
+        <Button
+          tone="quiet"
+          className="px-3"
+          icon={<TrashIcon />}
+          aria-label={t('action.delete')}
+          onClick={() => void remove.run()}
+        />
       )}
     </li>
   );
@@ -344,6 +362,7 @@ function MedicationRow({
           className="mt-2"
           disabled={tick.pending}
           onClick={() => void tick.run()}
+          icon={<CheckIcon />}
         >
           {t('action.done')} · {formatDate(next.dueOn, locale)}
         </Button>
@@ -429,6 +448,7 @@ function VaccinationSheet({
               nextDueOn: nextDueOn || undefined,
             })
           }
+          icon={<CheckIcon />}
         >
           {t('action.save')}
         </Button>
@@ -485,6 +505,7 @@ function ParasiteSheet({
           onClick={() =>
             void create.run({ target, productName: productName || undefined, administeredOn })
           }
+          icon={<CheckIcon />}
         >
           {t('action.save')}
         </Button>
@@ -538,6 +559,7 @@ function VisitSheet({
               treatment: treatment || undefined,
             })
           }
+          icon={<CheckIcon />}
         >
           {t('action.save')}
         </Button>
@@ -604,6 +626,7 @@ function MedicationSheet({
               endsOn: endsOn || undefined,
             })
           }
+          icon={<CheckIcon />}
         >
           {t('action.save')}
         </Button>
@@ -663,6 +686,7 @@ function FlagSheet({
           full
           disabled={create.pending || label.trim() === ''}
           onClick={() => void create.run({ kind, label, severity })}
+          icon={<CheckIcon />}
         >
           {t('action.save')}
         </Button>

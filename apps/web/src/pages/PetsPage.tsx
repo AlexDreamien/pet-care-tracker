@@ -8,7 +8,8 @@ import { useSession } from '../app/session';
 import { PetForm, petToValues, valuesToPayload } from '../components/PetForm';
 import { PasskeyOffer } from './PasskeyOffer';
 import { formatAge, initials } from '../lib/format';
-import { Badge, Button, Card, Empty, Sheet } from '../ui/primitives';
+import { ChevronRightIcon, PawIcon, PlusIcon } from '../ui/icons';
+import { Badge, Button, Card, Empty, PageHeader, Sheet } from '../ui/primitives';
 
 export function PetAvatar({ pet, size = 48 }: { pet: Pet; size?: number }): ReactNode {
   if (pet.avatarFileId) {
@@ -51,19 +52,28 @@ export function PetsPage(): ReactNode {
       {/* Home is where the offer belongs: the first thing seen after a password sign-in. */}
       <PasskeyOffer />
 
-      <header className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{t('nav.pets')}</h1>
-        {canWrite && <Button onClick={() => setAdding(true)}>{t('action.add')}</Button>}
-      </header>
+      <PageHeader
+        icon={<PawIcon />}
+        title={t('nav.pets')}
+        action={
+          canWrite && (
+            <Button onClick={() => setAdding(true)} icon={<PlusIcon />}>
+              {t('action.add')}
+            </Button>
+          )
+        }
+      />
 
       {pets.loading && <p className="text-muted">{t('state.loading')}</p>}
-      {!pets.loading && (pets.data?.pets.length ?? 0) === 0 && <Empty>{t('state.empty')}</Empty>}
+      {!pets.loading && (pets.data?.pets.length ?? 0) === 0 && (
+        <Empty icon={<PawIcon />}>{t('state.empty')}</Empty>
+      )}
 
       <ul className="space-y-3">
         {pets.data?.pets.map((pet) => (
           <li key={pet.id}>
             <Link to={`/pets/${pet.id}`} className="block">
-              <Card className="flex items-center gap-3 transition hover:border-brand/50">
+              <Card className="flex items-center gap-3 transition hover:border-brand/50 active:bg-brand-soft/40">
                 <PetAvatar pet={pet} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate font-medium">{pet.name}</p>
@@ -75,6 +85,7 @@ export function PetsPage(): ReactNode {
                 {/* Allergies and chronic conditions are the one thing shown unasked. */}
                 {pet.flags.length > 0 && <Badge tone="alarm">{pet.flags.length}</Badge>}
                 {pet.archivedAt && <Badge>{t('pet.archived')}</Badge>}
+                <ChevronRightIcon className="-ml-1 size-4 shrink-0 text-muted" />
               </Card>
             </Link>
           </li>

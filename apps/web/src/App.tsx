@@ -89,12 +89,14 @@ function SignedInApp(): ReactNode {
                 to={tab.to}
                 end={tab.to === '/'}
                 className={({ isActive }) =>
-                  `flex min-h-14 flex-col items-center justify-center gap-0.5 text-xs ${
-                    isActive ? 'text-brand' : 'text-muted'
+                  `group flex min-h-14 flex-col items-center justify-center gap-0.5 text-xs ${
+                    isActive ? 'is-active font-medium text-brand' : 'text-muted'
                   }`
                 }
               >
-                <tab.Icon className="size-6" />
+                <span className="rounded-full px-4 py-0.5 transition group-[.is-active]:bg-brand-soft">
+                  <tab.Icon className="size-6" />
+                </span>
                 {t(tab.key)}
               </NavLink>
             </li>

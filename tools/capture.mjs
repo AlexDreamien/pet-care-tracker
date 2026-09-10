@@ -334,6 +334,7 @@ async function main() {
   await shoot(`/pets/${rex.id}/measurements`, 'measurements', 'svg');
   await shoot(`/pets/${rex.id}/food`, 'food', 'text=Открытая пачка');
   await shoot('/expenses', 'expenses', 'text=Всего');
+  await shoot('/contacts', 'contacts', 'text=Айболит');
   await shoot('/settings', 'settings', 'text=Подписка на календарь');
   await shoot(`/pets/${rex.id}/labs`, 'labs', 'text=Creatinine');
   await shoot(`/pets/${rex.id}/print/card?preview`, 'emergency-card', 'text=Аллергия');

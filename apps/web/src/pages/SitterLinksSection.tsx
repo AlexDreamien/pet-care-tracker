@@ -5,6 +5,7 @@ import type { Pet } from '../api/types';
 import { useAction, useResource, useToday } from '../app/hooks';
 import { useSession, useUser } from '../app/session';
 import { formatDate } from '../lib/format';
+import { CheckIcon, CopyIcon, LinkIcon, PowerIcon } from '../ui/icons';
 import { Badge, Button, Card, Empty, Field, Input, SectionTitle } from '../ui/primitives';
 
 interface SitterLink {
@@ -61,7 +62,9 @@ export function SitterLinksSection(): ReactNode {
       <Card>
         <p className="mb-3 text-sm text-muted">{t('sitter.body')}</p>
 
-        {(links.data?.links.length ?? 0) === 0 && !creating && <Empty>{t('sitter.none')}</Empty>}
+        {(links.data?.links.length ?? 0) === 0 && !creating && (
+          <Empty icon={<LinkIcon />}>{t('sitter.none')}</Empty>
+        )}
 
         <ul className="space-y-3">
           {links.data?.links.map((link) => (
@@ -91,6 +94,7 @@ export function SitterLinksSection(): ReactNode {
                     <div className="mt-2 flex gap-2">
                       <Button
                         tone="quiet"
+                        icon={copied === link.id ? <CheckIcon /> : <CopyIcon />}
                         onClick={() => {
                           void navigator.clipboard.writeText(link.url);
                           setCopied(link.id);
@@ -102,6 +106,7 @@ export function SitterLinksSection(): ReactNode {
                         tone="danger"
                         disabled={revoke.pending}
                         onClick={() => void revoke.run(link.id)}
+                        icon={<PowerIcon />}
                       >
                         {t('sitter.revoke')}
                       </Button>
@@ -153,6 +158,7 @@ export function SitterLinksSection(): ReactNode {
                 <Button
                   disabled={create.pending || label.trim() === '' || selected.length === 0}
                   onClick={() => void create.run()}
+                  icon={<CheckIcon />}
                 >
                   {t('action.save')}
                 </Button>
@@ -162,7 +168,7 @@ export function SitterLinksSection(): ReactNode {
               </div>
             </div>
           ) : (
-            <Button className="mt-3" onClick={() => setCreating(true)}>
+            <Button className="mt-3" onClick={() => setCreating(true)} icon={<LinkIcon />}>
               {t('sitter.create')}
             </Button>
           ))}

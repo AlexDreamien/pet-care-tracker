@@ -5,7 +5,19 @@ import { useAction, useResource } from '../app/hooks';
 import { useSession } from '../app/session';
 import { BackHome } from '../components/BackHome';
 import type { MessageKey } from '../lib/i18n';
-import { Button, Card, Empty, Field, Input, Select, Sheet, TextArea } from '../ui/primitives';
+import { CheckIcon, ContactsIcon, GlobeIcon, PhoneIcon, PlusIcon, StarIcon } from '../ui/icons';
+import {
+  Button,
+  Card,
+  Empty,
+  Field,
+  Input,
+  PageHeader,
+  Select,
+  Sheet,
+  TextArea,
+  buttonClasses,
+} from '../ui/primitives';
 
 const KINDS = ['clinic', 'vet', 'groomer', 'trainer', 'sitter', 'taxi', 'other'] as const;
 
@@ -18,14 +30,21 @@ export function ContactsPage(): ReactNode {
     <>
       <BackHome />
 
-      <header className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{t('nav.contacts')}</h1>
-        {canWrite && <Button onClick={() => setAdding(true)}>{t('action.add')}</Button>}
-      </header>
+      <PageHeader
+        icon={<ContactsIcon />}
+        title={t('nav.contacts')}
+        action={
+          canWrite && (
+            <Button onClick={() => setAdding(true)} icon={<PlusIcon />}>
+              {t('action.add')}
+            </Button>
+          )
+        }
+      />
 
       {contacts.loading && <p className="text-muted">{t('state.loading')}</p>}
       {(contacts.data?.contacts.length ?? 0) === 0 && !contacts.loading && (
-        <Empty>{t('state.empty')}</Empty>
+        <Empty icon={<ContactsIcon />}>{t('state.empty')}</Empty>
       )}
 
       <ul className="space-y-3">
@@ -34,8 +53,10 @@ export function ContactsPage(): ReactNode {
             <Card>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <p className="truncate font-medium">
-                    {contact.favourite && <span aria-hidden>★ </span>}
+                  <p className="flex items-center gap-1.5 truncate font-medium">
+                    {contact.favourite && (
+                      <StarIcon className="size-4 shrink-0 fill-current text-brand" />
+                    )}
                     {contact.name}
                   </p>
                   <p className="text-sm text-muted">{t(`contact.${contact.kind}` as MessageKey)}</p>
@@ -46,8 +67,9 @@ export function ContactsPage(): ReactNode {
                 {contact.phone && (
                   <a
                     href={`tel:${contact.phone.replace(/[^+\d]/g, '')}`}
-                    className="inline-flex min-h-11 items-center rounded-xl bg-brand px-4 text-sm font-medium text-white"
+                    className={buttonClasses('primary')}
                   >
+                    <PhoneIcon />
                     {t('contact.call')}
                   </a>
                 )}
@@ -58,9 +80,10 @@ export function ContactsPage(): ReactNode {
                   href={contact.website}
                   target="_blank"
                   rel="noreferrer"
-                  className="mt-2 inline-block text-sm text-brand underline"
+                  className="mt-2 inline-flex max-w-full items-center gap-1.5 text-sm text-brand underline underline-offset-2"
                 >
-                  {contact.website}
+                  <GlobeIcon className="size-4 shrink-0" />
+                  <span className="truncate">{contact.website}</span>
                 </a>
               )}
               {contact.notes && <p className="mt-2 text-sm text-muted">{contact.notes}</p>}
@@ -167,7 +190,12 @@ function ContactSheet({
           <TextArea value={notes} onChange={(e) => setNotes(e.target.value)} />
         </Field>
 
-        <Button full disabled={save.pending || name.trim() === ''} onClick={() => void save.run()}>
+        <Button
+          full
+          disabled={save.pending || name.trim() === ''}
+          onClick={() => void save.run()}
+          icon={<CheckIcon />}
+        >
           {t('action.save')}
         </Button>
       </div>

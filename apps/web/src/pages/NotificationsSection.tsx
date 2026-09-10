@@ -2,6 +2,7 @@ import { type ReactNode, useEffect, useState } from 'react';
 import { api } from '../api/client';
 import { useAction, useResource } from '../app/hooks';
 import { useSession } from '../app/session';
+import { BellIcon, PowerIcon } from '../ui/icons';
 import { Badge, Button, Card, SectionTitle } from '../ui/primitives';
 
 interface PushKey {
@@ -157,6 +158,7 @@ export function NotificationsSection(): ReactNode {
                 !installedForIos
               }
               onClick={() => void enable.run()}
+              icon={<BellIcon />}
             >
               {t('push.enable')}
             </Button>
@@ -164,10 +166,20 @@ export function NotificationsSection(): ReactNode {
 
           {subscribed && (
             <>
-              <Button tone="quiet" disabled={test.pending} onClick={() => void test.run()}>
+              <Button
+                tone="quiet"
+                disabled={test.pending}
+                onClick={() => void test.run()}
+                icon={<BellIcon />}
+              >
                 {t('push.test')}
               </Button>
-              <Button tone="danger" disabled={disable.pending} onClick={() => void disable.run()}>
+              <Button
+                tone="danger"
+                disabled={disable.pending}
+                onClick={() => void disable.run()}
+                icon={<PowerIcon />}
+              >
                 {t('push.disable')}
               </Button>
             </>

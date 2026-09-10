@@ -5,6 +5,7 @@ import { useAction, useResource, useToday } from '../../app/hooks';
 import { useSession, useUser } from '../../app/session';
 import { documentUrgency, formatDate, formatRelativeDays } from '../../lib/format';
 import type { MessageKey } from '../../lib/i18n';
+import { CheckIcon, DocumentIcon, PlusIcon, UploadIcon } from '../../ui/icons';
 import { Badge, Button, Card, Empty, Field, Input, Select, Sheet } from '../../ui/primitives';
 
 const KINDS = [
@@ -28,13 +29,13 @@ export function DocumentsTab({ pet }: { pet: Pet }): ReactNode {
   return (
     <div className="space-y-4">
       {canWrite && (
-        <Button full onClick={() => setAdding(true)}>
+        <Button full onClick={() => setAdding(true)} icon={<PlusIcon />}>
           {t('action.add')}
         </Button>
       )}
 
       {(documents.data?.documents.length ?? 0) === 0 && !documents.loading && (
-        <Empty>{t('state.empty')}</Empty>
+        <Empty icon={<DocumentIcon />}>{t('state.empty')}</Empty>
       )}
 
       <ul className="space-y-3">
@@ -161,7 +162,12 @@ function DocumentSheet({
 
         <Field label={t('document.file')}>
           <div className="flex items-center gap-2">
-            <Button type="button" tone="quiet" onClick={() => fileInput.current?.click()}>
+            <Button
+              type="button"
+              tone="quiet"
+              onClick={() => fileInput.current?.click()}
+              icon={<UploadIcon />}
+            >
               {t('action.choose')}
             </Button>
             <span className="truncate text-sm text-muted">{file?.name ?? '—'}</span>
@@ -175,7 +181,12 @@ function DocumentSheet({
           />
         </Field>
 
-        <Button full disabled={save.pending || title.trim() === ''} onClick={() => void save.run()}>
+        <Button
+          full
+          disabled={save.pending || title.trim() === ''}
+          onClick={() => void save.run()}
+          icon={<CheckIcon />}
+        >
           {t('action.save')}
         </Button>
       </div>

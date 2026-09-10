@@ -9,7 +9,27 @@ import { LOCALES, type MessageKey } from '../lib/i18n';
 import { BackHome } from '../components/BackHome';
 import { NotificationsSection } from './NotificationsSection';
 import { SitterLinksSection } from './SitterLinksSection';
-import { Button, Card, Field, Input, Select, SectionTitle } from '../ui/primitives';
+import {
+  CheckIcon,
+  CopyIcon,
+  DownloadIcon,
+  KeyIcon,
+  PlusIcon,
+  RefreshIcon,
+  SettingsIcon,
+  SignOutIcon,
+  TrashIcon,
+} from '../ui/icons';
+import {
+  Button,
+  Card,
+  Field,
+  Input,
+  PageHeader,
+  Select,
+  SectionTitle,
+  buttonClasses,
+} from '../ui/primitives';
 
 interface HouseholdDetail {
   household: {
@@ -37,7 +57,7 @@ export function SettingsPage(): ReactNode {
     <div className="space-y-6">
       <div>
         <BackHome />
-        <h1 className="text-2xl font-semibold">{t('nav.settings')}</h1>
+        <PageHeader icon={<SettingsIcon />} title={t('nav.settings')} />
       </div>
 
       <ProfileCard onSaved={refresh} />
@@ -74,17 +94,14 @@ export function SettingsPage(): ReactNode {
         <SectionTitle>{t('settings.export')}</SectionTitle>
         <Card>
           <p className="mb-3 text-sm text-muted">{t('settings.exportHint')}</p>
-          <a
-            href="/api/v1/export"
-            download
-            className="inline-flex min-h-11 items-center rounded-xl border border-line bg-surface px-4 text-sm font-medium"
-          >
+          <a href="/api/v1/export" download className={buttonClasses('quiet')}>
+            <DownloadIcon />
             {t('settings.export')}
           </a>
         </Card>
       </section>
 
-      <Button tone="danger" full onClick={() => void signOut()}>
+      <Button tone="danger" full icon={<SignOutIcon />} onClick={() => void signOut()}>
         {t('action.signOut')} · {user.email}
       </Button>
     </div>
@@ -141,7 +158,7 @@ function ProfileCard({ onSaved }: { onSaved: () => Promise<void> }): ReactNode {
           </Select>
         </Field>
 
-        <Button disabled={save.pending} onClick={() => void save.run()}>
+        <Button disabled={save.pending} onClick={() => void save.run()} icon={<CheckIcon />}>
           {t('action.save')}
         </Button>
       </Card>
@@ -224,7 +241,7 @@ function HouseholdCard({
           </Select>
         </Field>
 
-        <Button disabled={save.pending} onClick={() => void save.run()}>
+        <Button disabled={save.pending} onClick={() => void save.run()} icon={<CheckIcon />}>
           {t('action.save')}
         </Button>
       </Card>
@@ -284,7 +301,7 @@ function RemindersCard({
           />
         </Field>
 
-        <Button disabled={save.pending} onClick={() => void save.run()}>
+        <Button disabled={save.pending} onClick={() => void save.run()} icon={<CheckIcon />}>
           {t('action.save')}
         </Button>
       </Card>
@@ -320,6 +337,7 @@ function CalendarCard({
         <div className="flex flex-wrap gap-2">
           <Button
             tone="quiet"
+            icon={copied ? <CheckIcon /> : <CopyIcon />}
             onClick={() => {
               void navigator.clipboard.writeText(detail.household.calendarUrl);
               setCopied(true);
@@ -329,7 +347,12 @@ function CalendarCard({
           </Button>
 
           {detail.role === 'owner' && (
-            <Button tone="danger" disabled={rotate.pending} onClick={() => void rotate.run()}>
+            <Button
+              tone="danger"
+              disabled={rotate.pending}
+              onClick={() => void rotate.run()}
+              icon={<RefreshIcon />}
+            >
               {t('settings.calendarRotate')}
             </Button>
           )}
@@ -396,6 +419,7 @@ function MembersCard({
             <Button
               disabled={invite.pending || email.trim() === ''}
               onClick={() => void invite.run()}
+              icon={<PlusIcon />}
             >
               {t('action.add')}
             </Button>
@@ -451,14 +475,23 @@ function PasskeyList({
                   : t('settings.passkeyNever')}
               </p>
             </div>
-            <Button tone="quiet" className="px-3" onClick={() => void remove.run(passkey.id)}>
-              ✕
-            </Button>
+            <Button
+              tone="quiet"
+              className="px-3"
+              icon={<TrashIcon />}
+              aria-label={t('action.delete')}
+              onClick={() => void remove.run(passkey.id)}
+            />
           </li>
         ))}
       </ul>
 
-      <Button tone="quiet" disabled={enrol.pending} onClick={() => void enrol.run()}>
+      <Button
+        tone="quiet"
+        disabled={enrol.pending}
+        onClick={() => void enrol.run()}
+        icon={<KeyIcon />}
+      >
         {t('settings.passkeyAdd')}
       </Button>
       {enrol.error && <p className="mt-2 text-sm text-alarm">{t('auth.passkeyFailed')}</p>}

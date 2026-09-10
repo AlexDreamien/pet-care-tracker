@@ -8,7 +8,15 @@ import { useSession } from '../../app/session';
 import { PetForm, petToValues, valuesToPayload } from '../../components/PetForm';
 import { formatDate } from '../../lib/format';
 import type { MessageKey } from '../../lib/i18n';
-import { Button, Card, SectionTitle, Sheet } from '../../ui/primitives';
+import {
+  ArchiveIcon,
+  CameraIcon,
+  HeartIcon,
+  PencilIcon,
+  PrintIcon,
+  RefreshIcon,
+} from '../../ui/icons';
+import { Button, Card, SectionTitle, Sheet, buttonClasses } from '../../ui/primitives';
 import { LostTagSection } from './LostTagSection';
 
 function Row({ label, value }: { label: string; value: ReactNode }): ReactNode {
@@ -91,12 +99,15 @@ export function ProfileTab({ pet, onChanged }: { pet: Pet; onChanged: () => void
 
       {canWrite && (
         <div className="flex flex-wrap gap-2">
-          <Button onClick={() => setEditing(true)}>{t('action.edit')}</Button>
+          <Button onClick={() => setEditing(true)} icon={<PencilIcon />}>
+            {t('action.edit')}
+          </Button>
 
           <Button
             tone="quiet"
             onClick={() => fileInput.current?.click()}
             disabled={uploadAvatar.pending}
+            icon={<CameraIcon />}
           >
             {t('action.photo')}
           </Button>
@@ -112,20 +123,22 @@ export function ProfileTab({ pet, onChanged }: { pet: Pet; onChanged: () => void
             }}
           />
 
-          <Button tone="quiet" onClick={() => void archive.run()}>
+          <Button
+            tone="quiet"
+            icon={pet.archivedAt ? <RefreshIcon /> : <ArchiveIcon />}
+            onClick={() => void archive.run()}
+          >
             {pet.archivedAt ? t('action.restore') : t('action.archive')}
           </Button>
         </div>
       )}
 
       <section>
-        <SectionTitle>{t('card.title')}</SectionTitle>
+        <SectionTitle icon={<HeartIcon />}>{t('card.title')}</SectionTitle>
         <Card>
           <p className="mb-3 text-sm text-muted">{t('card.body')}</p>
-          <Link
-            to={`/pets/${pet.id}/print/card`}
-            className="inline-flex min-h-11 items-center rounded-xl border border-line bg-surface px-4 text-sm font-medium"
-          >
+          <Link to={`/pets/${pet.id}/print/card`} className={buttonClasses('quiet')}>
+            <PrintIcon />
             {t('card.print')}
           </Link>
         </Card>

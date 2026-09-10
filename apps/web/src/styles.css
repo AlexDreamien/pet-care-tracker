@@ -11,9 +11,9 @@
  * below, which is conditional and works.
  */
 @theme {
-  --color-canvas: #f7f5f2;
+  --color-canvas: #f6f2ec;
   --color-surface: #ffffff;
-  --color-line: #e4ded6;
+  --color-line: #e6dfd4;
   --color-ink: #1f2421;
   --color-muted: #6b7069;
 
@@ -31,6 +31,10 @@
     system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
 
   --radius-card: 0.875rem;
+
+  /* Enough to lift a card off the canvas; not enough to be noticed as a shadow. */
+  --shadow-card: 0 1px 2px rgb(31 36 33 / 0.04), 0 6px 16px -8px rgb(31 36 33 / 0.1);
+  --shadow-button: 0 1px 2px rgb(47 111 94 / 0.25);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -50,6 +54,10 @@
 
     --color-calm: #8aa9d6;
     --color-calm-soft: #222c3a;
+
+    /* A shadow on a dark card is invisible; the border does the lifting. */
+    --shadow-card: 0 0 0 0 transparent;
+    --shadow-button: 0 0 0 0 transparent;
   }
 }
 

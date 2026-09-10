@@ -6,6 +6,7 @@ import { useAction, useResource, useToday } from '../../app/hooks';
 import { useSession, useUser } from '../../app/session';
 import { formatDate, formatRelativeDays } from '../../lib/format';
 import type { Locale } from '../../lib/i18n';
+import { BowlIcon, CheckIcon, PlusIcon } from '../../ui/icons';
 import { Badge, Button, Card, Empty, Field, Input, SectionTitle, Sheet } from '../../ui/primitives';
 
 interface FoodBag {
@@ -41,12 +42,14 @@ export function FoodTab({ pet }: { pet: Pet }): ReactNode {
   return (
     <div className="space-y-5">
       {canWrite && (
-        <Button full onClick={() => setAdding(true)}>
+        <Button full onClick={() => setAdding(true)} icon={<PlusIcon />}>
           {t('food.new')}
         </Button>
       )}
 
-      {open.length === 0 && past.length === 0 && !bags.loading && <Empty>{t('state.empty')}</Empty>}
+      {open.length === 0 && past.length === 0 && !bags.loading && (
+        <Empty icon={<BowlIcon />}>{t('state.empty')}</Empty>
+      )}
 
       {open.length > 0 && (
         <section>
@@ -163,6 +166,7 @@ function OpenBag({
           className="mt-3"
           disabled={finish.pending}
           onClick={() => void finish.run()}
+          icon={<CheckIcon />}
         >
           {t('food.finish')}
         </Button>
@@ -244,7 +248,12 @@ function AddBagSheet({
           </Field>
         </div>
 
-        <Button full disabled={save.pending || name.trim() === ''} onClick={() => void save.run()}>
+        <Button
+          full
+          disabled={save.pending || name.trim() === ''}
+          onClick={() => void save.run()}
+          icon={<CheckIcon />}
+        >
           {t('action.save')}
         </Button>
       </div>

@@ -5,7 +5,16 @@ import type { Pet } from '../../api/types';
 import { useAction, useResource } from '../../app/hooks';
 import { useSession } from '../../app/session';
 import { QrCode } from '../../components/QrCode';
-import { Button, Card, Field, Input, SectionTitle, TextArea } from '../../ui/primitives';
+import { CheckIcon, PencilIcon, PowerIcon, PrintIcon, RefreshIcon, TagIcon } from '../../ui/icons';
+import {
+  Button,
+  Card,
+  Field,
+  Input,
+  SectionTitle,
+  TextArea,
+  buttonClasses,
+} from '../../ui/primitives';
 
 interface LostTag {
   enabled: boolean;
@@ -91,6 +100,7 @@ export function LostTagSection({ pet }: { pet: Pet }): ReactNode {
               <Button
                 disabled={save.pending || contactName.trim() === '' || contactPhone.trim() === ''}
                 onClick={() => void save.run()}
+                icon={<CheckIcon />}
               >
                 {t('action.save')}
               </Button>
@@ -114,19 +124,27 @@ export function LostTagSection({ pet }: { pet: Pet }): ReactNode {
 
             {canWrite && (
               <div className="flex flex-wrap gap-2">
-                <Link
-                  to={`/pets/${pet.id}/print/tag`}
-                  className="inline-flex min-h-11 items-center rounded-xl bg-brand px-4 text-sm font-medium text-white"
-                >
+                <Link to={`/pets/${pet.id}/print/tag`} className={buttonClasses('primary')}>
+                  <PrintIcon />
                   {t('lost.print')}
                 </Link>
-                <Button tone="quiet" onClick={start}>
+                <Button tone="quiet" onClick={start} icon={<PencilIcon />}>
                   {t('action.edit')}
                 </Button>
-                <Button tone="quiet" disabled={rotate.pending} onClick={() => void rotate.run()}>
+                <Button
+                  tone="quiet"
+                  disabled={rotate.pending}
+                  onClick={() => void rotate.run()}
+                  icon={<RefreshIcon />}
+                >
                   {t('lost.rotate')}
                 </Button>
-                <Button tone="danger" disabled={disable.pending} onClick={() => void disable.run()}>
+                <Button
+                  tone="danger"
+                  disabled={disable.pending}
+                  onClick={() => void disable.run()}
+                  icon={<PowerIcon />}
+                >
                   {t('lost.disable')}
                 </Button>
               </div>
@@ -136,7 +154,11 @@ export function LostTagSection({ pet }: { pet: Pet }): ReactNode {
             <p className="text-xs text-muted">{t('lost.printHint')}</p>
           </div>
         ) : (
-          canWrite && <Button onClick={start}>{t('lost.enable')}</Button>
+          canWrite && (
+            <Button onClick={start} icon={<TagIcon />}>
+              {t('lost.enable')}
+            </Button>
+          )
         )}
       </Card>
     </section>

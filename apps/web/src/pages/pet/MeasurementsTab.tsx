@@ -7,6 +7,7 @@ import { useSession, useUser } from '../../app/session';
 import { ValueChart } from '../../components/MeasurementChart';
 import { formatDate, formatMeasurement, isStale } from '../../lib/format';
 import type { MessageKey } from '../../lib/i18n';
+import { CheckIcon, PlusIcon, ScaleIcon, TrashIcon } from '../../ui/icons';
 import {
   Badge,
   Button,
@@ -46,7 +47,7 @@ export function MeasurementsTab({ pet }: { pet: Pet }): ReactNode {
   return (
     <div className="space-y-6">
       {canWrite && (
-        <Button full onClick={() => setAdding(true)}>
+        <Button full onClick={() => setAdding(true)} icon={<PlusIcon />}>
           {t('measure.add')}
         </Button>
       )}
@@ -77,7 +78,9 @@ export function MeasurementsTab({ pet }: { pet: Pet }): ReactNode {
         </section>
       )}
 
-      {ordered.length === 0 && !series.loading && <Empty>{t('state.empty')}</Empty>}
+      {ordered.length === 0 && !series.loading && (
+        <Empty icon={<ScaleIcon />}>{t('state.empty')}</Empty>
+      )}
 
       {ordered.map((entry) => (
         <section key={entry.metric}>
@@ -166,7 +169,7 @@ function ReadingRow({
   metric: Metric;
   onDeleted: () => void;
 }): ReactNode {
-  const { locale, canWrite } = useSession();
+  const { t, locale, canWrite } = useSession();
   const user = useUser();
 
   const remove = useAction(async () => {
@@ -184,11 +187,11 @@ function ReadingRow({
         {canWrite && (
           <button
             type="button"
-            className="px-2 text-muted hover:text-alarm"
+            className="grid size-9 place-items-center rounded-full text-muted transition hover:bg-alarm-soft hover:text-alarm"
             onClick={() => void remove.run()}
-            aria-label="delete"
+            aria-label={t('action.delete')}
           >
-            ✕
+            <TrashIcon className="size-4.5" />
           </button>
         )}
       </span>
@@ -256,7 +259,12 @@ function AddReadingSheet({
           />
         </Field>
 
-        <Button full disabled={save.pending || value.trim() === ''} onClick={() => void save.run()}>
+        <Button
+          full
+          disabled={save.pending || value.trim() === ''}
+          onClick={() => void save.run()}
+          icon={<CheckIcon />}
+        >
           {t('action.save')}
         </Button>
       </div>
@@ -300,7 +308,7 @@ function TargetSheet({
           </Field>
         </div>
 
-        <Button full disabled={save.pending} onClick={() => void save.run()}>
+        <Button full disabled={save.pending} onClick={() => void save.run()} icon={<CheckIcon />}>
           {t('action.save')}
         </Button>
       </div>
